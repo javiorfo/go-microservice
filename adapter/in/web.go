@@ -1,5 +1,0 @@
-package in
-
-func handler() {
-
-}
