@@ -1,9 +1,9 @@
-# go-microservice (WIP)
-*Hexagonal architecture, Go, Tracing, Logging and Keycloak (WIP)*
+# rust-microservice (WIP)
+*Hexagonal architecture, Rust, Tracing, Logging and Keycloak (WIP)*
 
 ## TODO
 - [ ] Hexagonal architecture
-- [ ] Gorm DB connection
+- [ ] DB connection
 - [ ] Dependency Injection
 - [ ] Web controllers
 - [ ] Keycloak security
