@@ -1,5 +1,5 @@
-# rust-microservice (WIP)
-*Hexagonal architecture, Rust, Tracing, Logging and Keycloak (WIP)*
+# go-microservice (WIP)
+*Hexagonal architecture, Go, Tracing, Logging and Keycloak (WIP)*
 
 ## TODO
 - [ ] Hexagonal architecture
