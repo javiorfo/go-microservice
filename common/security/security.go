@@ -1,15 +1,10 @@
-package main
+package security
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/javiorfo/go-microservice/adapter/in/routes"
-	"github.com/javiorfo/go-microservice/domain/service/dummy"
 )
 
 var (
@@ -40,18 +35,3 @@ func SecureEndpoint(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "You have accessed a protected endpoint!"})
 }
-
-func main() {
-    dummyService := dummy.DummyService{}
-	app := fiber.New()
-
-	app.Use(logger.New())
-	app.Use(cors.New())
-    api := app.Group("/orfosys")
-    routes.DummyRouter(api, &dummyService)
-
-// 	app.Get("/orfosys/dummy", SecureEndpoint)
-
-	log.Fatal(app.Listen(":8080"))
-}
-
