@@ -1,4 +1,4 @@
-module github.com/javiorfo/go-microservice
+module github.com/chaosystema/go-microservice
 
 go 1.22.3
 
