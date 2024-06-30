@@ -1,7 +1,7 @@
 package dummy
 
 import (
-	"github.com/javiorfo/go-microservice/domain/model"
+	"github.com/chaosystema/go-microservice/domain/model"
 )
 
 type DummyService struct{}
