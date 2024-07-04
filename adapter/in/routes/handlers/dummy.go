@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/chaosystema/go-microservice/application/in"
-	"github.com/chaosystema/go-microservice/common/security"
-	"github.com/chaosystema/go-microservice/domain/model"
+	"github.com/javiorfo/go-microservice/application/in"
+	"github.com/javiorfo/go-microservice/common/security"
+	"github.com/javiorfo/go-microservice/domain/model"
 )
 
 func FindById(service in.FindByIdUseCase[*model.Dummy]) fiber.Handler {
