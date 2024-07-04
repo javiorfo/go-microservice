@@ -17,7 +17,7 @@ var (
 func init() {
 	client = gocloak.NewClient("http://localhost:8081")
 	realm = "orfosys"
-	clientID = "java-spring3-microservice"
+	clientID = "srv-client"
 	clientSecret = "RqaTlO0d2OnBbeRuImNnbLWm5yZL66Mo"
 }
 
