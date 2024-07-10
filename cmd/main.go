@@ -8,8 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/chaosystema/go-microservice/adapter/in/routes"
-	"github.com/chaosystema/go-microservice/domain/service/dummy"
+	"github.com/javiorfo/go-microservice/adapter/in/routes"
+	"github.com/javiorfo/go-microservice/domain/service/dummy"
 )
 
 var (
