@@ -4,8 +4,8 @@ import (
 	"github.com/javiorfo/go-microservice/domain/model"
 )
 
-type DummyService struct{}
+type Service struct{}
 
-func (d *DummyService) FindById(id int) (*model.Dummy, error) {
+func (d *Service) FindById(id int) (*model.Dummy, error) {
 	return &model.Dummy{Info: "info"}, nil
 }
