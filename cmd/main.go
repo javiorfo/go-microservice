@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gofiber/swagger"
 
 	"go.opentelemetry.io/otel"
-// 	"go.opentelemetry.io/otel/attribute"
+	// 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -34,8 +35,8 @@ var (
 
 func init() {
 	client = gocloak.NewClient("http://localhost:8081")
-	realm = "orfosys"
-	clientID = "java-spring3-microservice"
+	realm = "javi"
+	clientID = "srv-client"
 	clientSecret = "RqaTlO0d2OnBbeRuImNnbLWm5yZL66Mo"
 }
 
@@ -50,8 +51,8 @@ func SecureEndpoint(c *fiber.Ctx) error {
 	if err != nil || !*rptResult.Active {
 		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
 	}
-
-	return c.JSON(fiber.Map{"message": "You have accessed a protected endpoint!"})
+    return c.Next()
+// 	return c.JSON(fiber.Map{"message": "You have accessed a protected endpoint!"})
 }
 
 func startTracing() (*trace.TracerProvider, error) {
@@ -108,30 +109,35 @@ func main() {
 	_ = traceProvider.Tracer("my-app")
 
 	dummyService := dummy.Service{}
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+        AppName: "go-microservice v0.1.0",
+    })
 
-	app.Use(logger.New())
+    file, err := os.OpenFile("./go-microservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    if err != nil {
+        log.Fatalf("error opening file: %v", err)
+    }
+    defer file.Close()
+	app.Use(logger.New(logger.Config{ Output: file }))
 	app.Use(cors.New())
-    app.Use("/app", SecureEndpoint)
+//     app.Use("/app", SecureEndpoint)
 
 	api := app.Group("/app")
 	routes.DummyRouter(api, &dummyService)
 
 	app.Get("/app/swagger/*", swagger.HandlerDefault) // default
 
-	app.Get("/app/swagger/*", swagger.New(swagger.Config{ // custom
-		URL:         "http://example.com/doc.json",
+    // /app/swagger/index.html
+/* 	app.Get("/app/swagger/*", swagger.New(swagger.Config{ // custom
+        URL:         "http://localhost:8080/app/doc.json",
 		DeepLinking: false,
-		// Expand ("list") or Collapse ("none") tag groups by default
 		DocExpansion: "none",
-		// Prefill OAuth ClientId on Authorize popup
 		OAuth: &swagger.OAuthConfig{
 			AppName:  "srv-client",
 			ClientId: "21bb4edc-05a7-4afc-86f1-2e151e4ba6e2",
 		},
-		// Ability to change OAuth2 redirect uri location
 		OAuth2RedirectUrl: "http://localhost:8080/swagger/oauth2-redirect.html",
-	}))
+	})) */
 
 	// 	app.Get("/app/dummy", SecureEndpoint)
 
