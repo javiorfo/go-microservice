@@ -4,59 +4,29 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
-	"time"
+// 	"time"
 
 	"github.com/gofiber/swagger"
 
-	"go.opentelemetry.io/otel"
+// 	"go.opentelemetry.io/otel"
 	// 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+/* 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0" */
 
-	"github.com/Nerzal/gocloak/v13"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/javiorfo/go-microservice/adapter/in/routes"
+	"github.com/javiorfo/go-microservice/common/tracing"
+	"github.com/javiorfo/go-microservice/config"
 	"github.com/javiorfo/go-microservice/domain/service/dummy"
 )
 
-var (
-	client       *gocloak.GoCloak
-	realm        string
-	clientID     string
-	clientSecret string
-)
-
-func init() {
-	client = gocloak.NewClient("http://localhost:8081")
-	realm = "javi"
-	clientID = "srv-client"
-	clientSecret = "RqaTlO0d2OnBbeRuImNnbLWm5yZL66Mo"
-}
-
-func SecureEndpoint(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Authorization header missing"})
-	}
-
-	token := authHeader[len("Bearer "):]
-	rptResult, err := client.RetrospectToken(c.Context(), token, clientID, clientSecret, realm)
-	if err != nil || !*rptResult.Active {
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
-	}
-    return c.Next()
-// 	return c.JSON(fiber.Map{"message": "You have accessed a protected endpoint!"})
-}
-
-func startTracing() (*trace.TracerProvider, error) {
-	serviceName := "go-microservice"
+/* func startTracing() (*trace.TracerProvider, error) {
 	headers := map[string]string{
 		"content-type": "application/json",
 	}
@@ -83,8 +53,7 @@ func startTracing() (*trace.TracerProvider, error) {
 		trace.WithResource(
 			resource.NewWithAttributes(
 				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(serviceName),
-// 				attribute.String("environment", "testing"),
+				semconv.ServiceNameKey.String(config.AppName),
 			),
 		),
 	)
@@ -92,11 +61,11 @@ func startTracing() (*trace.TracerProvider, error) {
 	otel.SetTracerProvider(tracerprovider)
 
 	return tracerprovider, nil
-}
+} */
 
 func main() {
 	// Tracing
-    traceProvider, err := startTracing()
+    traceProvider, err := tracing.StartTracing(config.TracingHost, config.AppName)
 	if err != nil {
 		log.Fatalf("traceprovider: %v", err)
 	}
@@ -106,26 +75,28 @@ func main() {
 		}
 	}()
 
-	_ = traceProvider.Tracer("my-app")
+	_ = traceProvider.Tracer(config.AppName)
 
-	dummyService := dummy.Service{}
 	app := fiber.New(fiber.Config{
-        AppName: "go-microservice v0.1.0",
+        AppName: config.AppName,
     })
 
-    file, err := os.OpenFile("./go-microservice.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+    file, err := os.OpenFile(fmt.Sprintf("./%s.log", config.AppName), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
     if err != nil {
         log.Fatalf("error opening file: %v", err)
     }
     defer file.Close()
 	app.Use(logger.New(logger.Config{ Output: file }))
 	app.Use(cors.New())
-//     app.Use("/app", SecureEndpoint)
 
-	api := app.Group("/app")
-	routes.DummyRouter(api, &dummyService)
+	api := app.Group(config.AppContextPath)
 
-	app.Get("/app/swagger/*", swagger.HandlerDefault) // default
+    // Service injection
+/* 	dummyService := dummy.NewService()
+	routes.DummyRouter(api, config.KeycloakConfig, dummyService) */
+    injection(api)
+
+	app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.HandlerDefault) // default
 
     // /app/swagger/index.html
 /* 	app.Get("/app/swagger/*", swagger.New(swagger.Config{ // custom
@@ -141,5 +112,10 @@ func main() {
 
 	// 	app.Get("/app/dummy", SecureEndpoint)
 
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(app.Listen(":" + config.AppPort))
+}
+
+func injection(api fiber.Router) {
+    dummyService := dummy.NewService()
+	routes.DummyRouter(api, config.KeycloakConfig, dummyService)
 }

@@ -1,19 +1,18 @@
-# go-microservice (WIP)
-*Hexagonal architecture, Go, Tracing, Logging and Keycloak (WIP)*
+# go-microservice
+*Hexagonal architecture, Go, Tracing, Logging and Keycloak*
 
 ## TODO
 - [ ] Hexagonal architecture
 - [ ] DB connection
-- [ ] Dependency Injection
-- [ ] Web controllers
-- [ ] Keycloak security
+- [x] Web controllers
+- [x] Keycloak security
 - [ ] Logs
 - [ ] Custom Responses
 - [ ] Custom Errors
 - [ ] Pagination
 - [ ] Auditory
 - [ ] Swagger
-- [ ] Distributing tracing
+- [x] Distributing tracing
 - [ ] Logstash integration
-- [ ] Jaeger integration
+- [x] Jaeger integration
 - [ ] Dockerfile 

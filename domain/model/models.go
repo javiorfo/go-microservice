@@ -1,5 +1,5 @@
 package model
 
 type Dummy struct {
-    Info string
+    Info string `json:"info"`
 }

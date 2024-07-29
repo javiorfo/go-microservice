@@ -10,49 +10,36 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-var (
-	keycloak     *gocloak.GoCloak
-	realm        string
-	clientID     string
-	clientSecret string
-)
-
-func init() {
-	keycloak = gocloak.NewClient("http://localhost:8081")
-	realm = "javi"
-	clientID = "srv-client"
-	clientSecret = "RqaTlO0d2OnBbeRuImNnbLWm5yZL66Mo"
+type Securizer interface {
+	SecureWithRoles(roles ...string) fiber.Handler
 }
 
-func SecureEndpoint(c *fiber.Ctx) error {
-	authHeader := c.Get("Authorization")
-	if authHeader == "" {
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Authorization header missing"})
-	}
-
-	token := authHeader[len("Bearer "):]
-	rptResult, err := keycloak.RetrospectToken(c.Context(), token, clientID, clientSecret, realm)
-	if err != nil || !*rptResult.Active {
-		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
-	}
-
-	return c.JSON(fiber.Map{"message": "You have accessed a protected endpoint!"})
+type KeycloakConfig struct {
+	Keycloak     *gocloak.GoCloak
+	Realm        string
+	ClientID     string
+	ClientSecret string
+	Enabled      bool
 }
 
-func SecureEndpointWithRoles(roles ...string) fiber.Handler {
+func (kc KeycloakConfig) SecureWithRoles(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		if !kc.Enabled {
+			return c.Next()
+		}
+
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Authorization header missing"})
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
-		rptResult, err := keycloak.RetrospectToken(c.Context(), token, clientID, clientSecret, realm)
+		rptResult, err := kc.Keycloak.RetrospectToken(c.Context(), token, kc.ClientID, kc.ClientSecret, kc.Realm)
 		if err != nil || !*rptResult.Active {
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
 		}
 
-		if !userHasRole(token, roles) {
+		if !userHasRole(kc.ClientID, token, roles) {
 			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "user does not have permission to access"})
 		}
 		return c.Next()
@@ -60,14 +47,11 @@ func SecureEndpointWithRoles(roles ...string) fiber.Handler {
 }
 
 type customClaims struct {
-/* 	RealmAccess struct {
-		Roles []string `json:"roles"`
-	} `json:"realm_access"` */
 	ResourceAccess map[string]any `json:"resource_access"`
 	jwt.StandardClaims
 }
 
-func userHasRole(tokenStr string, roles []string) bool {
+func userHasRole(clientID, tokenStr string, roles []string) bool {
 	token, _, err := new(jwt.Parser).ParseUnverified(tokenStr, &customClaims{})
 	if err != nil {
 		log.Errorf("Error parsing token: %v", err)
@@ -82,7 +66,7 @@ func userHasRole(tokenStr string, roles []string) bool {
 
 	resourceData, ok := claims.ResourceAccess[clientID]
 	if !ok {
-		log.Fatalf("Resource key %s not found", clientID)
+		log.Errorf("Resource key %s not found", clientID)
 		return false
 	}
 
@@ -97,7 +81,7 @@ func userHasRole(tokenStr string, roles []string) bool {
 			}
 		}
 		return false
-	} 
+	}
 
 	log.Info("No roles found for resource key", clientID)
 	return false
