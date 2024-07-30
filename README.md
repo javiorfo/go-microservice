@@ -1,18 +1,13 @@
 # go-microservice
-*Hexagonal architecture, Go, Tracing, Logging and Keycloak*
+*Clean architecture, Golang, Tracing, Logging and Keycloak*
 
 ## TODO
-- [ ] Hexagonal architecture
-- [ ] DB connection
-- [x] Web controllers
-- [x] Keycloak security
-- [ ] Logs
-- [ ] Custom Responses
-- [ ] Custom Errors
-- [ ] Pagination
-- [ ] Auditory
-- [ ] Swagger
-- [x] Distributing tracing
-- [ ] Logstash integration
-- [x] Jaeger integration
-- [ ] Dockerfile 
+- DB connection
+- Logs
+- Custom Responses
+- Custom Errors
+- Pagination
+- Auditory
+- Swagger
+- Logstash integration
+- Dockerfile 

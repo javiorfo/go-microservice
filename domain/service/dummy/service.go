@@ -1,6 +1,7 @@
 package dummy
 
 import (
+	"github.com/javiorfo/go-microservice/adapter/persistence/dummy"
 	"github.com/javiorfo/go-microservice/domain/model"
 )
 
@@ -9,13 +10,13 @@ type Service interface {
 }
 
 type service struct{
-// repository
+    repository dummy.Repository
 }
 
 // func NewService(r Repository) Service {
-func NewService() Service {
+func NewService(r dummy.Repository) Service {
 	return &service{
-// 		repository: r,
+		repository: r,
 	}
 }
 
