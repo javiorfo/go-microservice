@@ -3,68 +3,28 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
+	"io"
 	"os"
-	// 	"time"
 
 	"github.com/gofiber/swagger"
-
-	// 	"go.opentelemetry.io/otel"
-	// 	"go.opentelemetry.io/otel/attribute"
-	/* 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
-	   	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
-	   	"go.opentelemetry.io/otel/sdk/resource"
-	   	"go.opentelemetry.io/otel/sdk/trace"
-	   	semconv "go.opentelemetry.io/otel/semconv/v1.26.0" */
+	"go.opentelemetry.io/otel"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/javiorfo/go-microservice/adapter/api/routes"
-	dummyRepository "github.com/javiorfo/go-microservice/adapter/persistence/dummy"
+	"github.com/javiorfo/go-microservice/common/injection"
 	"github.com/javiorfo/go-microservice/common/tracing"
 	"github.com/javiorfo/go-microservice/config"
-	"github.com/javiorfo/go-microservice/domain/service/dummy"
 )
 
-/* func startTracing() (*trace.TracerProvider, error) {
-	headers := map[string]string{
-		"content-type": "application/json",
-	}
-
-	exporter, err := otlptrace.New(
-		context.Background(),
-		otlptracehttp.NewClient(
-			otlptracehttp.WithEndpoint("localhost:4318"),
-			otlptracehttp.WithHeaders(headers),
-			otlptracehttp.WithInsecure(),
-		),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("error crearing exporter: %w", err)
-	}
-
-	tracerprovider := trace.NewTracerProvider(
-		trace.WithBatcher(
-			exporter,
-			trace.WithMaxExportBatchSize(trace.DefaultMaxExportBatchSize),
-			trace.WithBatchTimeout(trace.DefaultScheduleDelay*time.Millisecond),
-			trace.WithMaxExportBatchSize(trace.DefaultMaxExportBatchSize),
-		),
-		trace.WithResource(
-			resource.NewWithAttributes(
-				semconv.SchemaURL,
-				semconv.ServiceNameKey.String(config.AppName),
-			),
-		),
-	)
-
-	otel.SetTracerProvider(tracerprovider)
-
-	return tracerprovider, nil
-} */
-
 func main() {
+    // Database
+    err := config.DBDataConnection.Connect()
+    if err != nil {
+        log.Fatal("Failed to connect to database. \n", err)
+    }
+
 	// Tracing
 	traceProvider, err := tracing.StartTracing(config.TracingHost, config.AppName)
 	if err != nil {
@@ -78,24 +38,41 @@ func main() {
 
 	_ = traceProvider.Tracer(config.AppName)
 
-	app := fiber.New(fiber.Config{
-		AppName: config.AppName,
-	})
+	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
+	app.Use(cors.New())
+
+    app.Use(func(c *fiber.Ctx) error {
+		tracer := otel.Tracer(config.AppName)
+		ctx, span := tracer.Start(c.Context(), c.Path())
+		defer span.End()
+
+		c.SetUserContext(ctx)
+        c.Locals("traceID", span.SpanContext().TraceID())
+        c.Locals("spanID", span.SpanContext().SpanID())
+
+		return c.Next()
+	})
+    log.Info("Tracing configured!")
+
+    // Web logger
 	file, err := os.OpenFile(fmt.Sprintf("./%s.log", config.AppName), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
+    iw := io.MultiWriter(os.Stdout, file)
+    log.SetOutput(iw)
 	defer file.Close()
-	app.Use(logger.New(logger.Config{Output: file}))
-	app.Use(cors.New())
+
+	app.Use(logger.New(logger.Config{
+        Format:     "${time} | ${method} ${ip}${path} | response: ${status} ${error} | [traceID: ${locals:traceID}, spanID: ${locals:spanID}] - ${latency}\n",
+        TimeFormat: "2006/01/02 15:04:05.666666",
+        Output: iw,
+    }))
 
 	api := app.Group(config.AppContextPath)
 
-	// Service injection
-	/* 	dummyService := dummy.NewService()
-	   	routes.DummyRouter(api, config.KeycloakConfig, dummyService) */
-	injection(api)
+	injection.Inject(api)
 
 	app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.HandlerDefault) // default
 
@@ -113,9 +90,8 @@ func main() {
 
 	// 	app.Get("/app/dummy", SecureEndpoint)
 
-	log.Fatal(app.Listen(":" + config.AppPort))
-}
-
-func injection(api fiber.Router) {
-	routes.DummyRouter(api, config.KeycloakConfig, dummy.NewService(dummyRepository.NewRepository()))
+    log.Infof("Context path: %s", config.AppContextPath)
+    log.Infof("Starting %s on port %s...", config.AppName, config.AppPort)
+    log.Info("Server Up!")
+	log.Fatal(app.Listen(config.AppPort))
 }

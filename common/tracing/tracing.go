@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -48,4 +49,8 @@ func StartTracing(host, appName string) (*trace.TracerProvider, error) {
 	otel.SetTracerProvider(tracerprovider)
 
 	return tracerprovider, nil
+}
+
+func LogTraceAndSpan(c *fiber.Ctx) string {
+    return fmt.Sprintf("[traceID: %s, spanID: %s]", c.Locals("traceID"), c.Locals("spanID"))
 }

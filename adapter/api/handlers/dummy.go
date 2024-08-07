@@ -1,38 +1,43 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
-
-	"go.opentelemetry.io/otel"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 
-	"github.com/javiorfo/go-microservice/config"
+	// 	"github.com/javiorfo/go-microservice/adapter/api/handlers"
+	"github.com/javiorfo/go-microservice/common/security"
+	"github.com/javiorfo/go-microservice/common/tracing"
 	"github.com/javiorfo/go-microservice/domain/model"
-	"github.com/javiorfo/go-microservice/domain/service/dummy"
+	"github.com/javiorfo/go-microservice/domain/service"
 )
 
-var tracer = otel.Tracer(fmt.Sprintf("%s/adapter/api/handlers/dummy", config.AppName))
+func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyService) {
+	app.Get("/dummy/:id", sec.SecureWithRoles("CLIENT_ADMIN"), func(c *fiber.Ctx) error {
+		param := c.Params("id")
+		log.Infof("%s Find dummy by ID: %v", tracing.LogTraceAndSpan(c), param)
 
-func FindDummyById(service dummy.Service) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-        _, span := tracer.Start(c.Context(), "FindDummyByID")
-        log.Infof("TraceID: %v SpanID: %v", span.SpanContext().TraceID(), span.SpanContext().SpanID())
-	    defer span.End()
-
-		fetched, err := service.FindById(1)
+		id, err := strconv.Atoi(param)
 		if err != nil {
-			c.Status(http.StatusInternalServerError)
-			return c.JSON(BookErrorResponse(err))
+            log.Error("Invalid ID")
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Invalid ID",
+			})
 		}
 
-		return c.JSON(BookSuccessResponse(fetched))
-	}
+		dummy, err := ds.FindById(id)
+		if err != nil {
+			c.Status(http.StatusInternalServerError)
+			return c.JSON(DummyErrorResponse(err))
+		}
+
+		return c.JSON(DummySuccessResponse(dummy))
+	})
 }
 
-func BookSuccessResponse(data *model.Dummy) *fiber.Map {
+func DummySuccessResponse(data *model.Dummy) *fiber.Map {
 	return &fiber.Map{
 		"status": true,
 		"data":   data,
@@ -40,7 +45,7 @@ func BookSuccessResponse(data *model.Dummy) *fiber.Map {
 	}
 }
 
-func BookErrorResponse(err error) *fiber.Map {
+func DummyErrorResponse(err error) *fiber.Map {
 	return &fiber.Map{
 		"status": false,
 		"data":   "",

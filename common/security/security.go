@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt"
+	"github.com/javiorfo/go-microservice/common/tracing"
 )
 
 type Securizer interface {
@@ -24,23 +25,30 @@ type KeycloakConfig struct {
 
 func (kc KeycloakConfig) SecureWithRoles(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+        log.Infof("%s Keycloak capture: %s", tracing.LogTraceAndSpan(c), c.Path())
 		if !kc.Enabled {
 			return c.Next()
 		}
-
+        
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Authorization header missing"})
+            msg := "Authorization header missing"
+            log.Errorf("%s %s", tracing.LogTraceAndSpan(c), msg)
+			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": msg})
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		rptResult, err := kc.Keycloak.RetrospectToken(c.Context(), token, kc.ClientID, kc.ClientSecret, kc.Realm)
 		if err != nil || !*rptResult.Active {
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
+            msg := "Invalid or expired token"
+            log.Errorf("%s %s", tracing.LogTraceAndSpan(c), msg)
+			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": msg})
 		}
 
 		if !userHasRole(kc.ClientID, token, roles) {
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "user does not have permission to access"})
+            msg := "user does not have permission to access"
+            log.Errorf("%s %s", tracing.LogTraceAndSpan(c), msg)
+			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": msg})
 		}
 		return c.Next()
 	}

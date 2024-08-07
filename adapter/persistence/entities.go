@@ -1,6 +1,10 @@
 package persistence
 
 type DummyEntity struct {
-    Id   int
-    Info string
+    ID   uint `gorm:"primaryKey;autoIncrement"`
+	Info string
+}
+
+func (DummyEntity) TableName() string {
+  return "dummies"
 }

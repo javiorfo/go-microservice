@@ -1,0 +1,25 @@
+package service
+
+import (
+	"github.com/javiorfo/go-microservice/adapter/persistence/repository"
+	"github.com/javiorfo/go-microservice/domain/model"
+)
+
+type DummyService interface {
+    FindById(id int) (*model.Dummy, error)
+}
+
+type dummyService struct{
+    repository repository.DummyRepository
+}
+
+// func NewService(r Repository) Service {
+func NewDummyService(r repository.DummyRepository) DummyService {
+	return &dummyService{
+		repository: r,
+	}
+}
+
+func (service *dummyService) FindById(id int) (*model.Dummy, error) {
+    return service.repository.FindById(id)
+}
