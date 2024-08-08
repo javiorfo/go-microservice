@@ -1,6 +1,7 @@
 package security
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -8,8 +9,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt"
-	"github.com/javiorfo/go-microservice/common/response"
-	"github.com/javiorfo/go-microservice/common/tracing"
+	"github.com/javiorfo/go-microservice/internal/response"
+	"github.com/javiorfo/go-microservice/internal/tracing"
 )
 
 type Securizer interface {
@@ -24,10 +25,6 @@ type KeycloakConfig struct {
 	Enabled      bool
 }
 
-var authorizationHeaderError = response.NewRestResponseError(response.ResponseError{Code: "AUTH", Message: "Authorization header missing"}) 
-var invalidTokenError = response.NewRestResponseError(response.ResponseError{Code: "AUTH", Message: "Invalid or expired token"})
-var unauthorizedRoleError = response.NewRestResponseError(response.ResponseError{Code: "AUTH", Message: "User does not have permission to access"})
-
 func (kc KeycloakConfig) SecureWithRoles(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		log.Infof("%s Keycloak capture: %s", tracing.LogTraceAndSpan(c), c.Path())
@@ -37,6 +34,10 @@ func (kc KeycloakConfig) SecureWithRoles(roles ...string) fiber.Handler {
 
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
+			authorizationHeaderError := response.NewRestResponseError(response.ResponseError{
+				Code:    "AUTH",
+				Message: "Authorization header missing",
+			})
 			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), authorizationHeaderError)
 			return c.Status(http.StatusUnauthorized).JSON(authorizationHeaderError)
 		}
@@ -44,40 +45,49 @@ func (kc KeycloakConfig) SecureWithRoles(roles ...string) fiber.Handler {
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		rptResult, err := kc.Keycloak.RetrospectToken(c.Context(), token, kc.ClientID, kc.ClientSecret, kc.Realm)
 		if err != nil || !*rptResult.Active {
+			invalidTokenError := response.NewRestResponseError(response.ResponseError{
+				Code:    "AUTH",
+				Message: "Invalid or expired token",
+			})
 			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), invalidTokenError)
 			return c.Status(http.StatusUnauthorized).JSON(invalidTokenError)
 		}
 
-		if !userHasRole(kc.ClientID, token, roles) {
+		if user, err := userHasRole(kc.ClientID, token, roles); err != nil {
+			unauthorizedRoleError := response.NewRestResponseError(response.ResponseError{
+				Code:    "AUTH",
+				Message: "User does not have permission to access",
+			})
 			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), unauthorizedRoleError)
 			return c.Status(http.StatusUnauthorized).JSON(unauthorizedRoleError)
+		} else {
+			c.Locals("tokenUser", *user)
+			return c.Next()
 		}
-		return c.Next()
 	}
 }
 
 type customClaims struct {
-	ResourceAccess map[string]any `json:"resource_access"`
+	ResourceAccess    map[string]any `json:"resource_access"`
+	PreferredUsername string         `json:"preferred_username"`
 	jwt.StandardClaims
 }
 
-func userHasRole(clientID, tokenStr string, roles []string) bool {
+func userHasRole(clientID, tokenStr string, roles []string) (*string, error) {
 	token, _, err := new(jwt.Parser).ParseUnverified(tokenStr, &customClaims{})
 	if err != nil {
-		log.Errorf("Error parsing token: %v", err)
-		return false
+		return nil, fmt.Errorf("Error parsing token: %v", err)
 	}
 
 	claims, ok := token.Claims.(*customClaims)
 	if !ok {
 		log.Errorf("Error asserting claims")
-		return false
+		return nil, fmt.Errorf("Error asserting claims")
 	}
 
 	resourceData, ok := claims.ResourceAccess[clientID]
 	if !ok {
-		log.Errorf("Resource key %s not found", clientID)
-		return false
+		return nil, fmt.Errorf("Resource key %s not found", clientID)
 	}
 
 	resourceMap := resourceData.(map[string]any)
@@ -86,13 +96,12 @@ func userHasRole(clientID, tokenStr string, roles []string) bool {
 		for _, cr := range clientRoles {
 			for _, r := range roles {
 				if r == cr.(string) {
-					return true
+					return &claims.PreferredUsername, nil
 				}
 			}
 		}
-		return false
+		return nil, fmt.Errorf("Error searching client roles")
 	}
 
-	log.Info("No roles found for resource key", clientID)
-	return false
+	return nil, fmt.Errorf("No roles found for resource key %s", clientID)
 }

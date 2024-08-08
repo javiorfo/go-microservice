@@ -4,8 +4,8 @@ import (
 	"os"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/javiorfo/go-microservice/common/database"
-	"github.com/javiorfo/go-microservice/common/security"
+	"github.com/javiorfo/go-microservice/internal/database"
+	"github.com/javiorfo/go-microservice/internal/security"
 )
 
 // Keycloak configuration

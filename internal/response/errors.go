@@ -10,6 +10,12 @@ func NewRestResponseError(re ResponseError) *restResponseError {
 	}
 }
 
+func NewRestResponseErrorWithCodeAndMsg(code, msg string) *restResponseError {
+	return &restResponseError{
+		Errors: []ResponseError{{code, msg}},
+	}
+}
+
 func (rre *restResponseError) AddError(re ResponseError) *restResponseError {
 	rre.Errors = append(rre.Errors, re)
 	return rre

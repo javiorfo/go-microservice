@@ -3,7 +3,7 @@
 
 ## TODO
 - List, Pagination and sorting
-- Auditory
+- Migrations
 - Swagger
 - Unit Test
-- Create
+- go fmt

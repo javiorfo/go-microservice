@@ -1,0 +1,6 @@
+package codes
+
+const (
+	DUMMY_FIND_ERROR   = "DUMMY_FIND_ERROR"
+	DUMMY_CREATE_ERROR = "DUMMY_CREATE_ERROR"
+)

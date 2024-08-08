@@ -13,8 +13,8 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/javiorfo/go-microservice/common/injection"
-	"github.com/javiorfo/go-microservice/common/tracing"
+	"github.com/javiorfo/go-microservice/internal/injection"
+	"github.com/javiorfo/go-microservice/internal/tracing"
 	"github.com/javiorfo/go-microservice/config"
 )
 
