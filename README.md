@@ -1,13 +1,9 @@
 # go-microservice
-*Clean architecture, Golang, Tracing, Logging and Keycloak*
+*Tracing, Logging and Keycloak*
 
 ## TODO
-- DB connection
-- Logs
-- Custom Responses
-- Custom Errors
-- Pagination
+- List, Pagination and sorting
 - Auditory
 - Swagger
-- Logstash integration
-- Dockerfile 
+- Unit Test
+- Create

@@ -2,11 +2,11 @@ package injection
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/javiorfo/go-microservice/adapter/api/handlers"
-	"github.com/javiorfo/go-microservice/adapter/persistence/repository"
+	"github.com/javiorfo/go-microservice/api/handlers"
 	"github.com/javiorfo/go-microservice/common/database"
 	"github.com/javiorfo/go-microservice/config"
 	"github.com/javiorfo/go-microservice/domain/service"
+	"github.com/javiorfo/go-microservice/domain/repository"
 )
 
 func Inject(api fiber.Router) {

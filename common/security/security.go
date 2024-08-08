@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt"
+	"github.com/javiorfo/go-microservice/common/response"
 	"github.com/javiorfo/go-microservice/common/tracing"
 )
 
@@ -23,32 +24,33 @@ type KeycloakConfig struct {
 	Enabled      bool
 }
 
+var authorizationHeaderError = response.NewRestResponseError(response.ResponseError{Code: "AUTH", Message: "Authorization header missing"}) 
+var invalidTokenError = response.NewRestResponseError(response.ResponseError{Code: "AUTH", Message: "Invalid or expired token"})
+var unauthorizedRoleError = response.NewRestResponseError(response.ResponseError{Code: "AUTH", Message: "User does not have permission to access"})
+
 func (kc KeycloakConfig) SecureWithRoles(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-        log.Infof("%s Keycloak capture: %s", tracing.LogTraceAndSpan(c), c.Path())
+		log.Infof("%s Keycloak capture: %s", tracing.LogTraceAndSpan(c), c.Path())
 		if !kc.Enabled {
 			return c.Next()
 		}
-        
+
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
-            msg := "Authorization header missing"
-            log.Errorf("%s %s", tracing.LogTraceAndSpan(c), msg)
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": msg})
+			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), authorizationHeaderError)
+			return c.Status(http.StatusUnauthorized).JSON(authorizationHeaderError)
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		rptResult, err := kc.Keycloak.RetrospectToken(c.Context(), token, kc.ClientID, kc.ClientSecret, kc.Realm)
 		if err != nil || !*rptResult.Active {
-            msg := "Invalid or expired token"
-            log.Errorf("%s %s", tracing.LogTraceAndSpan(c), msg)
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": msg})
+			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), invalidTokenError)
+			return c.Status(http.StatusUnauthorized).JSON(invalidTokenError)
 		}
 
 		if !userHasRole(kc.ClientID, token, roles) {
-            msg := "user does not have permission to access"
-            log.Errorf("%s %s", tracing.LogTraceAndSpan(c), msg)
-			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": msg})
+			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), unauthorizedRoleError)
+			return c.Status(http.StatusUnauthorized).JSON(unauthorizedRoleError)
 		}
 		return c.Next()
 	}
