@@ -27,10 +27,10 @@ func (repository *dummyRepository) FindById(id int) (*model.Dummy, error) {
 	var dummy model.Dummy
 
 	result := repository.Find(&dummy, "id = ?", id)
-    
-    if err := result.Error; err != nil {
-        return nil, err
-    }
+
+	if err := result.Error; err != nil {
+		return nil, err
+	}
 
 	if result.RowsAffected == 0 {
 		return nil, errors.New("Dummy Not found")

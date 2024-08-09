@@ -10,10 +10,10 @@ import (
 )
 
 func Inject(api fiber.Router) {
-    // Database
+	// Database
 	db := database.DBinstance
 
-    // Dummy: Repository, Servicer and Handler
+	// Dummy: Repository, Servicer and Handler
 	dummyRepository := repository.NewDummyRepository(db)
 	dummyService := service.NewDummyService(dummyRepository)
 	handlers.DummyHandler(api, config.KeycloakConfig, dummyService)

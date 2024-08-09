@@ -73,9 +73,8 @@ func main() {
 	api := app.Group(config.AppContextPath)
 
 	app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.HandlerDefault) // default
-	
-    injection.Inject(api)
 
+	injection.Inject(api)
 
 	// /app/swagger/index.html
 	/* 	app.Get("/app/swagger/*", swagger.New(swagger.Config{ // custom
