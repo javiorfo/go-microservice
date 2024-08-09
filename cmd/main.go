@@ -13,17 +13,17 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/javiorfo/go-microservice/config"
 	"github.com/javiorfo/go-microservice/internal/injection"
 	"github.com/javiorfo/go-microservice/internal/tracing"
-	"github.com/javiorfo/go-microservice/config"
 )
 
 func main() {
-    // Database
-    err := config.DBDataConnection.Connect()
-    if err != nil {
-        log.Fatal("Failed to connect to database. \n", err)
-    }
+	// Database
+	err := config.DBDataConnection.Connect()
+	if err != nil {
+		log.Fatal("Failed to connect to database. \n", err)
+	}
 
 	// Tracing
 	traceProvider, err := tracing.StartTracing(config.TracingHost, config.AppName)
@@ -42,39 +42,40 @@ func main() {
 
 	app.Use(cors.New())
 
-    app.Use(func(c *fiber.Ctx) error {
+	app.Use(func(c *fiber.Ctx) error {
 		tracer := otel.Tracer(config.AppName)
 		ctx, span := tracer.Start(c.Context(), c.Path())
 		defer span.End()
 
 		c.SetUserContext(ctx)
-        c.Locals("traceID", span.SpanContext().TraceID())
-        c.Locals("spanID", span.SpanContext().SpanID())
+		c.Locals("traceID", span.SpanContext().TraceID())
+		c.Locals("spanID", span.SpanContext().SpanID())
 
 		return c.Next()
 	})
-    log.Info("Tracing configured!")
+	log.Info("Tracing configured!")
 
-    // Web logger
+	// Web logger
 	file, err := os.OpenFile(fmt.Sprintf("./%s.log", config.AppName), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
-    iw := io.MultiWriter(os.Stdout, file)
-    log.SetOutput(iw)
+	iw := io.MultiWriter(os.Stdout, file)
+	log.SetOutput(iw)
 	defer file.Close()
 
 	app.Use(logger.New(logger.Config{
-        Format:     "${time} | ${method} ${ip}${path} | response: ${status} ${error} | [traceID: ${locals:traceID}, spanID: ${locals:spanID}] - ${latency}\n",
-        TimeFormat: "2006/01/02 15:04:05.666666",
-        Output: iw,
-    }))
+		Format:     "${time} | ${method} ${ip}${path} | response: ${status} ${error} | [traceID: ${locals:traceID}, spanID: ${locals:spanID}] - ${latency}\n",
+		TimeFormat: "2006/01/02 15:04:05.000000",
+		Output:     iw,
+	}))
 
 	api := app.Group(config.AppContextPath)
 
-	injection.Inject(api)
-
 	app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.HandlerDefault) // default
+	
+    injection.Inject(api)
+
 
 	// /app/swagger/index.html
 	/* 	app.Get("/app/swagger/*", swagger.New(swagger.Config{ // custom
@@ -90,8 +91,8 @@ func main() {
 
 	// 	app.Get("/app/dummy", SecureEndpoint)
 
-    log.Infof("Context path: %s", config.AppContextPath)
-    log.Infof("Starting %s on port %s...", config.AppName, config.AppPort)
-    log.Info("Server Up!")
+	log.Infof("Context path: %s", config.AppContextPath)
+	log.Infof("Starting %s on port %s...", config.AppName, config.AppPort)
+	log.Info("Server Up!")
 	log.Fatal(app.Listen(config.AppPort))
 }

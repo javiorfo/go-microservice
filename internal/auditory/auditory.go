@@ -13,6 +13,20 @@ type Auditable struct {
 	LastModified   *time.Time `json:"-" gorm:"autoUpdateTime"`
 }
 
+func MapFieldToColumn(fieldName string) string {
+	fieldToColumnMap := map[string]string{
+		"CreatedBy":      "created_by",
+		"CreateDate":     "create_date",
+		"LastModifiedBy": "last_modified_by",
+		"LastModified":   "last_modified",
+	}
+
+	if columnName, ok := fieldToColumnMap[fieldName]; ok {
+		return columnName
+	}
+	return fieldName
+}
+
 func GetTokenUser(c *fiber.Ctx) string {
 	if tokenUser := c.Locals("tokenUser"); tokenUser != nil {
 		return tokenUser.(string)

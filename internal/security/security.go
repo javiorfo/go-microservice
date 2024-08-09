@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/golang-jwt/jwt"
 	"github.com/javiorfo/go-microservice/internal/response"
+	"github.com/javiorfo/go-microservice/internal/response/codes"
 	"github.com/javiorfo/go-microservice/internal/tracing"
 )
 
@@ -34,31 +35,28 @@ func (kc KeycloakConfig) SecureWithRoles(roles ...string) fiber.Handler {
 
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
-			authorizationHeaderError := response.NewRestResponseError(response.ResponseError{
-				Code:    "AUTH",
+			authorizationHeaderError := response.NewRestResponseError(c, response.ResponseError{
+				Code:    codes.AUTH_ERROR,
 				Message: "Authorization header missing",
 			})
-			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), authorizationHeaderError)
 			return c.Status(http.StatusUnauthorized).JSON(authorizationHeaderError)
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		rptResult, err := kc.Keycloak.RetrospectToken(c.Context(), token, kc.ClientID, kc.ClientSecret, kc.Realm)
 		if err != nil || !*rptResult.Active {
-			invalidTokenError := response.NewRestResponseError(response.ResponseError{
-				Code:    "AUTH",
+			invalidTokenError := response.NewRestResponseError(c, response.ResponseError{
+				Code:    codes.AUTH_ERROR,
 				Message: "Invalid or expired token",
 			})
-			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), invalidTokenError)
 			return c.Status(http.StatusUnauthorized).JSON(invalidTokenError)
 		}
 
 		if user, err := userHasRole(kc.ClientID, token, roles); err != nil {
-			unauthorizedRoleError := response.NewRestResponseError(response.ResponseError{
-				Code:    "AUTH",
+			unauthorizedRoleError := response.NewRestResponseError(c, response.ResponseError{
+				Code:    codes.AUTH_ERROR,
 				Message: "User does not have permission to access",
 			})
-			log.Errorf("%s %s", tracing.LogTraceAndSpan(c), unauthorizedRoleError)
 			return c.Status(http.StatusUnauthorized).JSON(unauthorizedRoleError)
 		} else {
 			c.Locals("tokenUser", *user)

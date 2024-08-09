@@ -3,11 +3,12 @@ package service
 import (
 	"github.com/javiorfo/go-microservice/domain/model"
 	"github.com/javiorfo/go-microservice/domain/repository"
+	"github.com/javiorfo/go-microservice/internal/pagination"
 )
 
 type DummyService interface {
 	FindById(id int) (*model.Dummy, error)
-	FindAll() ([]*model.Dummy, error)
+	FindAll(pagination.Page) ([]model.Dummy, error)
 	Create(model.Dummy) error
 }
 
@@ -26,8 +27,8 @@ func (service *dummyService) FindById(id int) (*model.Dummy, error) {
 	return service.repository.FindById(id)
 }
 
-func (service *dummyService) FindAll() ([]*model.Dummy, error) {
-	return nil, nil
+func (service *dummyService) FindAll(page pagination.Page) ([]model.Dummy, error) {
+	return service.repository.FindAll(page)
 }
 
 func (service *dummyService) Create(d model.Dummy) error {

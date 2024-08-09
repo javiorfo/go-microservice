@@ -52,5 +52,5 @@ func StartTracing(host, appName string) (*trace.TracerProvider, error) {
 }
 
 func LogTraceAndSpan(c *fiber.Ctx) string {
-    return fmt.Sprintf("[traceID: %s, spanID: %s]", c.Locals("traceID"), c.Locals("spanID"))
+	return fmt.Sprintf("[traceID: %s, spanID: %s]", c.Locals("traceID"), c.Locals("spanID"))
 }
