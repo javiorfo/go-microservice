@@ -34,7 +34,7 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 				JSON(response.NewRestResponseErrorWithCodeAndMsg(c, codes.DUMMY_FIND_ERROR, "Invalid ID"))
 		}
 
-		if dummy, err := ds.FindById(id); err != nil {
+		if dummy, err := ds.FindById(uint(id)); err != nil {
 			return c.Status(http.StatusNotFound).
 				JSON(response.NewRestResponseErrorWithCodeAndMsg(c, codes.DUMMY_FIND_ERROR, err.Error()))
 		} else {
@@ -81,18 +81,19 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 
 		log.Infof("%s Received dummy: %+v", tracing.LogTraceAndSpan(c), dummyRequest)
 
-		err := ds.Create(model.Dummy{
+		dummy := model.Dummy{
 			Info: dummyRequest.Info,
 			Auditable: auditory.Auditable{
 				CreatedBy: auditory.GetTokenUser(c),
 			},
-		})
+		}
+		err := ds.Create(&dummy)
 
 		if err != nil {
 			return c.Status(http.StatusBadRequest).
 				JSON(response.InternalServerError(c, err.Error()))
 		}
 
-		return c.Status(fiber.StatusCreated).JSON(dummyRequest)
+		return c.Status(fiber.StatusCreated).JSON(dummy)
 	})
 }

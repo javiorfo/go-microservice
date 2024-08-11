@@ -10,9 +10,9 @@ import (
 )
 
 type DummyRepository interface {
-	FindById(id int) (*model.Dummy, error)
+	FindById(id uint) (*model.Dummy, error)
 	FindAll(pagination.Page) ([]model.Dummy, error)
-	Create(model.Dummy) error
+	Create(*model.Dummy) error
 }
 
 type dummyRepository struct {
@@ -23,7 +23,7 @@ func NewDummyRepository(db *gorm.DB) DummyRepository {
 	return &dummyRepository{db}
 }
 
-func (repository *dummyRepository) FindById(id int) (*model.Dummy, error) {
+func (repository *dummyRepository) FindById(id uint) (*model.Dummy, error) {
 	var dummy model.Dummy
 
 	result := repository.Find(&dummy, "id = ?", id)
@@ -51,8 +51,8 @@ func (repository *dummyRepository) FindAll(page pagination.Page) ([]model.Dummy,
 	return dummies, nil
 }
 
-func (repository *dummyRepository) Create(d model.Dummy) error {
-	result := repository.DB.Create(&d)
+func (repository *dummyRepository) Create(d *model.Dummy) error {
+	result := repository.DB.Create(d)
 
 	if err := result.Error; err != nil {
 		return fmt.Errorf("Error creating dummy %v", err)

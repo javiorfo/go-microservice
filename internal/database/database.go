@@ -42,9 +42,6 @@ func (db DBDataConnection) Connect() error {
 
 	log.Info("Connected to DB!")
 	database.Logger = loggerSQL
-	// 	log.Info("Running migrations...")
-	// 	db.AutoMigrate(&model.User{})
-
 	DBinstance = database
 	return nil
 }
