@@ -44,20 +44,3 @@ func Paginator(p Page, total int) response.PaginationResponse {
 		Total:      total,
 	}
 }
-
-/* public class Paginator {
-    public record Pair<T>(PaginationResponse pagination, List<T> results) {
-        public Pair {
-            pagination = Objects.requireNonNull(pagination);
-        }
-    }
-
-    public static <T, R> Pair<R> create(Page<T> page, Function<T, R> mapper) {
-        var content = page.getContent().stream().map(mapper).toList();
-        var pageNumber = page.getPageable().getPageNumber();
-        var pageSize = page.getPageable().getPageSize();
-        var total = page.getTotalElements();
-        var pagination = new PaginationResponse(pageNumber, pageSize, total);
-        return new Pair<R>(pagination, content);
-    }
-} */

@@ -2,14 +2,14 @@
 *Tracing, Logging and Keycloak*
 
 ## TODO
-- Dockerfile (make docker)
 - Swagger
 - Trace/Span response
 - Unit Test
     - Repository
-    - Service
-    - Handler
 - Review
+    - Logs
+    - go-microservice name
+    - version (make)
 - Doc
 
 ## Later

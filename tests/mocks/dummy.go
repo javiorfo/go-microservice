@@ -13,12 +13,18 @@ type MockDummyService struct {
 
 func (m *MockDummyService) FindById(id uint) (*model.Dummy, error) {
 	args := m.Called(id)
-	return args.Get(0).(*model.Dummy), args.Error(1)
+	if dummy, ok := args.Get(0).(*model.Dummy); ok {
+		return dummy, args.Error(1)
+	}
+	return nil, args.Error(1)
 }
 
 func (m *MockDummyService) FindAll(page pagination.Page) ([]model.Dummy, error) {
 	args := m.Called(page)
-	return args.Get(0).([]model.Dummy), args.Error(1)
+	if dummies, ok := args.Get(0).([]model.Dummy); ok {
+		return dummies, args.Error(1)
+	}
+	return nil, args.Error(1)
 }
 
 func (m *MockDummyService) Create(dummy *model.Dummy) error {
@@ -33,12 +39,18 @@ type MockDummyRepository struct {
 
 func (m *MockDummyRepository) FindById(id uint) (*model.Dummy, error) {
 	args := m.Called(id)
-	return args.Get(0).(*model.Dummy), args.Error(1)
+	if dummy, ok := args.Get(0).(*model.Dummy); ok {
+		return dummy, args.Error(1)
+	}
+	return nil, args.Error(1)
 }
 
 func (m *MockDummyRepository) FindAll(page pagination.Page) ([]model.Dummy, error) {
-	args := m.Called(page)
-	return args.Get(0).([]model.Dummy), args.Error(1)
+    args := m.Called(page)
+	if dummies, ok := args.Get(0).([]model.Dummy); ok {
+		return dummies, args.Error(1)
+	}
+	return nil, args.Error(1)
 }
 
 func (m *MockDummyRepository) Create(dummy *model.Dummy) error {

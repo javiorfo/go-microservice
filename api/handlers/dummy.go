@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"net/http"
-	"strconv"
-
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"net/http"
+	"strconv"
 
 	"github.com/javiorfo/go-microservice/api/request"
 	"github.com/javiorfo/go-microservice/domain/model"
@@ -22,7 +22,6 @@ var keycloakRoles = "CLIENT_ADMIN"
 
 func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyService) {
 
-	// Get by ID
 	app.Get("/dummy/:id", sec.SecureWithRoles(keycloakRoles), func(c *fiber.Ctx) error {
 		param := c.Params("id")
 		log.Infof("%s Find dummy by ID: %v", tracing.LogTraceAndSpan(c), param)
@@ -42,7 +41,6 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 		}
 	})
 
-	// List with pagination and sorting
 	app.Get("/dummy", sec.SecureWithRoles(keycloakRoles), func(c *fiber.Ctx) error {
 		p := c.Query("page", "1")
 		s := c.Query("size", "10")
@@ -55,12 +53,12 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 		page, err := pagination.ValidateAndGetPage(p, s, sb, so)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).
-				JSON(response.InternalServerError(c, err.Error()))
+				JSON(response.NewRestResponseErrorWithCodeAndMsg(c, codes.DUMMY_FIND_ERROR, err.Error()))
 		}
 
 		dummies, err := ds.FindAll(*page)
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).
+			return c.Status(fiber.StatusInternalServerError).
 				JSON(response.InternalServerError(c, err.Error()))
 		}
 
@@ -70,13 +68,18 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 		})
 	})
 
-	// Create
 	app.Post("/dummy", sec.SecureWithRoles(keycloakRoles), func(c *fiber.Ctx) error {
-		var dummyRequest request.Dummy
+		dummyRequest := new(request.Dummy)
 
-		if err := c.BodyParser(&dummyRequest); err != nil {
+		if err := c.BodyParser(dummyRequest); err != nil {
 			return c.Status(http.StatusBadRequest).
 				JSON(response.NewRestResponseErrorWithCodeAndMsg(c, codes.DUMMY_CREATE_ERROR, "Invalid request body"))
+		}
+		validate := validator.New()
+		if err := validate.Struct(dummyRequest); err != nil {
+			validationErrors := err.(validator.ValidationErrors)
+			return c.Status(fiber.StatusBadRequest).
+				JSON(response.NewRestResponseErrorWithCodeAndMsg(c, codes.DUMMY_CREATE_ERROR, validationErrors.Error()))
 		}
 
 		log.Infof("%s Received dummy: %+v", tracing.LogTraceAndSpan(c), dummyRequest)
@@ -90,10 +93,10 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 		err := ds.Create(&dummy)
 
 		if err != nil {
-			return c.Status(http.StatusBadRequest).
+			return c.Status(http.StatusInternalServerError).
 				JSON(response.InternalServerError(c, err.Error()))
 		}
 
-		return c.Status(fiber.StatusCreated).JSON(dummy)
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"dummy": dummy})
 	})
 }

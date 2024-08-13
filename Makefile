@@ -20,9 +20,10 @@ all: build
 build:
 	@echo "Building the application..."
 	@mkdir -p $(BIN_DIR)
+	@go mod download
 	@gofmt -w .
 	@go build -o $(BIN_DIR)/$(APP_NAME)$(EXE) $(MAIN_DIR)/main.go
-	@echo "$(APP_NAME)$(EXE) created!"
+	@echo "$(APP_NAME)$(EXE)-$(VERSION) created!"
 
 .PHONY: test
 test:
@@ -31,7 +32,7 @@ test:
 
 .PHONY: clean
 clean:
-	@echo "Cleaning up '$(BIN_DIR)'"
+	@echo "Cleaning up $(BIN_DIR)/$(APP_NAME)"
 	@$(RM) $(BIN_DIR)
 	@echo "Done!"
 
@@ -62,5 +63,3 @@ help:
 	@echo "  make migrate  - Migrate database schema"
 	@echo "  make docker   - Create Docker image"
 	@echo "  make help     - Show this help message"
-
-

@@ -33,7 +33,7 @@ func (repository *dummyRepository) FindById(id uint) (*model.Dummy, error) {
 	}
 
 	if result.RowsAffected == 0 {
-		return nil, errors.New("Dummy Not found")
+		return nil, errors.New("Dummy not found")
 	}
 
 	return &dummy, nil
@@ -41,8 +41,12 @@ func (repository *dummyRepository) FindById(id uint) (*model.Dummy, error) {
 
 func (repository *dummyRepository) FindAll(page pagination.Page) ([]model.Dummy, error) {
 	var dummies []model.Dummy
-	offset := (page.Page - 1)
-	results := repository.Offset(offset).Limit(page.Size).Order(fmt.Sprintf("%s %s", page.SortBy, page.SortOrder)).Find(&dummies)
+
+	results := repository.
+		Offset(page.Page - 1).
+		Limit(page.Size).
+		Order(fmt.Sprintf("%s %s", page.SortBy, page.SortOrder)).
+		Find(&dummies)
 
 	if err := results.Error; err != nil {
 		return nil, err
