@@ -38,10 +38,12 @@ func main() {
 
 	_ = traceProvider.Tracer(config.AppName)
 
+    // Fiber
 	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
 	app.Use(cors.New())
 
+    // Tracing in context
 	app.Use(func(c *fiber.Ctx) error {
 		tracer := otel.Tracer(config.AppName)
 		ctx, span := tracer.Start(c.Context(), c.Path())
@@ -70,6 +72,7 @@ func main() {
 		Output:     iw,
 	}))
 
+    // Context Path
 	api := app.Group(config.AppContextPath)
 
 	app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.HandlerDefault) // default

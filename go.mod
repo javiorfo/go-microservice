@@ -1,6 +1,6 @@
 module github.com/javiorfo/go-microservice
 
-go 1.22.3
+go 1.23.0
 
 require (
 	github.com/Nerzal/gocloak/v13 v13.9.0

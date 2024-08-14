@@ -50,7 +50,6 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Failed to get container port: %s", err)
 	}
 
-	// TODO replace with connect
 	dsn := "host=" + host + " port=" + port.Port() + " user=testuser password=testpass dbname=testdb sslmode=disable"
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -76,14 +75,13 @@ func TestMain(m *testing.M) {
 
 func TestDummy(t *testing.T) {
 
-	testRecord := model.Dummy{Info: "testname"}
+	dummyRecord := model.Dummy{Info: "testname"}
 
-	if err := repo.Create(&testRecord); err != nil {
+	if err := repo.Create(&dummyRecord); err != nil {
 		t.Fatalf("Failed to insert record: %v", err)
 	}
 
-	// 	var queriedRecord model.Dummy
-	dummy, err := repo.FindById(testRecord.ID)
+	dummy, err := repo.FindById(dummyRecord.ID)
 	if err != nil {
 		t.Fatalf("Failed to query record: %v", err)
 	}

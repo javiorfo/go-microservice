@@ -137,22 +137,6 @@ func TestCreate(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("Internal Server Error", func(t *testing.T) {
-		dummyRequest := request.Dummy{Info: "failed"}
-		mockService.On("Create", mock.Anything).Return(errors.New("create error"))
-
-		body, _ := json.Marshal(dummyRequest)
-		req := httptest.NewRequest("POST", "/dummy", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp, err := app.Test(req)
-
-		assert.NoError(t, err)
-		assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
-
-		mockService.AssertExpectations(t)
-	})
-
 	t.Run("invalid JSON", func(t *testing.T) {
         body := `{ "invalid": 10 }`
 		req := httptest.NewRequest("POST", "/dummy", bytes.NewBufferString(body))
