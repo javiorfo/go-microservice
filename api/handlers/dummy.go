@@ -14,15 +14,21 @@ import (
 	"github.com/javiorfo/go-microservice/internal/pagination"
 	"github.com/javiorfo/go-microservice/internal/response"
 	"github.com/javiorfo/go-microservice/internal/response/codes"
-	"github.com/javiorfo/go-microservice/internal/security"
 	"github.com/javiorfo/go-microservice/internal/tracing"
 )
 
-var keycloakRoles = "CLIENT_ADMIN"
-
-func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyService) {
-
-	app.Get("/dummy/:id", sec.SecureWithRoles(keycloakRoles), func(c *fiber.Ctx) error {
+// @Summary		Find a dummy by ID
+// @Description	Get dummy details by ID
+// @Tags			dummy
+// @Accept			json
+// @Produce		json
+// @Param			id	path		int	true	"Dummy ID"
+// @Success		200	{object}	model.Dummy
+// @Failure		400	{object}	response.restResponseError	"Invalid ID"
+// @Failure		404	{object}	response.restResponseError	"Internal Error"
+// @Router			/dummy/{id} [get]
+func GetDummyById(ds service.DummyService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
 		param := c.Params("id")
 		log.Infof("%s Find dummy by ID: %v", tracing.LogTraceAndSpan(c), param)
 
@@ -37,11 +43,26 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 			return c.Status(http.StatusNotFound).
 				JSON(response.NewRestResponseErrorWithCodeAndMsg(c, codes.DUMMY_FIND_ERROR, err.Error()))
 		} else {
-			return c.JSON(fiber.Map{"dummy": dummy})
+			return c.JSON(dummy)
 		}
-	})
+	}
+}
 
-	app.Get("/dummy", sec.SecureWithRoles(keycloakRoles), func(c *fiber.Ctx) error {
+// @Summary		List all dummies
+// @Description	Get a list of dummies with pagination
+// @Tags			dummy
+// @Accept			json
+// @Produce		json
+// @Param			page		query		int												false	"Page number"
+// @Param			size		query		int												false	"Size per page"
+// @Param			sortBy		query		string											false	"Sort by field"
+// @Param			sortOrder	query		string											false	"Sort order (asc or desc)"
+// @Success		200			{object}	response.RestResponsePagination[model.Dummy]	"Paginated list of dummies"
+// @Failure		400			{object}	response.restResponseError						"Invalid query parameters"
+// @Failure		500			{object}	response.restResponseError						"Internal server error"
+// @Router			/dummy [get]
+func GetDummies(ds service.DummyService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
 		p := c.Query("page", "1")
 		s := c.Query("size", "10")
 		sb := c.Query("sortBy", "id")
@@ -66,9 +87,21 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 			Pagination: pagination.Paginator(*page, len(dummies)),
 			Elements:   dummies,
 		})
-	})
+	}
+}
 
-	app.Post("/dummy", sec.SecureWithRoles(keycloakRoles), func(c *fiber.Ctx) error {
+// @Summary		Create a new dummy item
+// @Description	Create a new dummy item with the provided information
+// @Tags			dummy
+// @Accept			json
+// @Produce		json
+// @Param			dummy	body		request.Dummy	true	"Dummy information"
+// @Success		201		{object}	model.Dummy
+// @Failure		400		{object}	response.restResponseError	"Invalid request body or validation errors"
+// @Failure		500		{object}	response.restResponseError	"Internal server error"
+// @Router			/dummy [post]
+func CreateDummy(ds service.DummyService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
 		dummyRequest := new(request.Dummy)
 
 		if err := c.BodyParser(dummyRequest); err != nil {
@@ -97,6 +130,6 @@ func DummyHandler(app fiber.Router, sec security.Securizer, ds service.DummyServ
 				JSON(response.InternalServerError(c, err.Error()))
 		}
 
-		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"dummy": dummy})
-	})
+		return c.Status(fiber.StatusCreated).JSON(dummy)
+	}
 }

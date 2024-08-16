@@ -20,9 +20,8 @@ all: build
 build:
 	@echo "Building the application..."
 	@mkdir -p $(BIN_DIR)
-	@go mod download
 	@gofmt -w .
-	@go build -o $(BIN_DIR)/$(APP_NAME)$(EXE) $(MAIN_DIR)/main.go
+	@go build -o $(BIN_DIR)/$(APP_NAME)$(EXE) main.go
 	@echo "$(APP_NAME)$(EXE)-$(VERSION) created!"
 
 .PHONY: clean
@@ -45,21 +44,33 @@ info:
 	@echo "Name: $(APP_NAME)"
 	@echo "Version: $(VERSION)"
 	@echo "Binary folder: $(BIN_DIR)"
-	@echo "Go main folder: $(MAIN_DIR)"
+
+.PHONY: install
+install:
+	@echo "Downloading libraries..."
+	@go mod download
+	@echo "Installing swag..."
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "Done!"
 
 .PHONY: migrate
 migrate:
 	@echo "Running database schema migration..."
-	@go run $(MAIN_DIR)/migrator/main.go
+	@go run internal/migrator/main.go
+	@echo "Done!"
 
 .PHONY: run
 run:
 	@echo "Running the application $(APP_NAME)..."
-	@go run $(MAIN_DIR)/main.go
+	@go run main.go
 
 .PHONY: swagger
 swagger:
 	@echo "Creating swagger api..."
+	@swag init
+	@swag fmt
+	@go run docs/cmd/replace.go
+	@echo "Done!"
 
 .PHONY: test
 test:
@@ -70,6 +81,7 @@ test:
 tidy:
 	@echo "Running go mod tidy..."
 	@go mod tidy
+	@echo "Done!"
 
 .PHONY: help
 help:

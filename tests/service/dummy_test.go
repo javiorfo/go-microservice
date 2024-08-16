@@ -12,66 +12,65 @@ import (
 )
 
 func TestFindById(t *testing.T) {
-    mockRepo := new(mocks.MockDummyRepository)
-    dummyService := service.NewDummyService(mockRepo)
+	mockRepo := new(mocks.MockDummyRepository)
+	dummyService := service.NewDummyService(mockRepo)
 
-    id := uint(1)
-    expectedDummy := &model.Dummy{ID: id}
+	id := uint(1)
+	expectedDummy := &model.Dummy{ID: id}
 
-    mockRepo.On("FindById", id).Return(expectedDummy, nil)
+	mockRepo.On("FindById", id).Return(expectedDummy, nil)
 
-    result, err := dummyService.FindById(id)
+	result, err := dummyService.FindById(id)
 
-    assert.NoError(t, err)
-    assert.Equal(t, expectedDummy, result)
-    mockRepo.AssertExpectations(t)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedDummy, result)
+	mockRepo.AssertExpectations(t)
 }
 
 func TestFindByIdNotFound(t *testing.T) {
-    mockRepo := new(mocks.MockDummyRepository)
-    dummyService := service.NewDummyService(mockRepo)
+	mockRepo := new(mocks.MockDummyRepository)
+	dummyService := service.NewDummyService(mockRepo)
 
-    id := uint(1)
+	id := uint(1)
 
-    mockRepo.On("FindById", id).Return(nil, errors.New("not found"))
+	mockRepo.On("FindById", id).Return(nil, errors.New("not found"))
 
-    result, err := dummyService.FindById(id)
+	result, err := dummyService.FindById(id)
 
-    assert.Error(t, err)
-    assert.Nil(t, result)
-    mockRepo.AssertExpectations(t)
+	assert.Error(t, err)
+	assert.Nil(t, result)
+	mockRepo.AssertExpectations(t)
 }
 
 func TestFindAll(t *testing.T) {
-    mockRepo := new(mocks.MockDummyRepository)
-    dummyService := service.NewDummyService(mockRepo)
+	mockRepo := new(mocks.MockDummyRepository)
+	dummyService := service.NewDummyService(mockRepo)
 
-    page := pagination.Page{Page: 1, Size: 10, SortBy: "id", SortOrder: "asc"}
-    expectedDummies := []model.Dummy{
-        {ID: 1},
-        {ID: 2},
-    }
+	page := pagination.Page{Page: 1, Size: 10, SortBy: "id", SortOrder: "asc"}
+	expectedDummies := []model.Dummy{
+		{ID: 1},
+		{ID: 2},
+	}
 
-    mockRepo.On("FindAll", page).Return(expectedDummies, nil)
+	mockRepo.On("FindAll", page).Return(expectedDummies, nil)
 
-    result, err := dummyService.FindAll(page)
+	result, err := dummyService.FindAll(page)
 
-    assert.NoError(t, err)
-    assert.Equal(t, expectedDummies, result)
-    mockRepo.AssertExpectations(t)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedDummies, result)
+	mockRepo.AssertExpectations(t)
 }
 
 func TestCreate(t *testing.T) {
-    mockRepo := new(mocks.MockDummyRepository)
-    dummyService := service.NewDummyService(mockRepo)
+	mockRepo := new(mocks.MockDummyRepository)
+	dummyService := service.NewDummyService(mockRepo)
 
-    newDummy := &model.Dummy{ID: 1}
+	newDummy := &model.Dummy{ID: 1}
 
-    mockRepo.On("Create", newDummy).Return(nil)
+	mockRepo.On("Create", newDummy).Return(nil)
 
-    err := dummyService.Create(newDummy)
+	err := dummyService.Create(newDummy)
 
-    assert.NoError(t, err)
-    mockRepo.AssertExpectations(t)
+	assert.NoError(t, err)
+	mockRepo.AssertExpectations(t)
 }
-

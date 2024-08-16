@@ -22,7 +22,7 @@ func StartTracing(host, appName string) (*trace.TracerProvider, error) {
 	exporter, err := otlptrace.New(
 		context.Background(),
 		otlptracehttp.NewClient(
-			otlptracehttp.WithEndpoint(host),
+			otlptracehttp.WithEndpointURL(host),
 			otlptracehttp.WithHeaders(headers),
 			otlptracehttp.WithInsecure(),
 		),

@@ -2,7 +2,7 @@
 *Golang archetype oriented to microservices.*
 
 ## Dependencies
-Go, Docker, Make
+Golang, Docker, Make, [Swag tool](https://github.com/swaggo/swag)
 
 ## Features
 - Architecture
@@ -25,7 +25,8 @@ Go, Docker, Make
 - Distributed tracing
     - OpenTelemetry, Micrometer and Jaeger
 - Swagger
-    - OpenApi
+    - Swaggo & Fiber Swagger
+    - Customized with command **make swagger** (OAuth2 server by parameter and not static)
 - Auditory
     - Gorm custom auditory
 - Database
@@ -51,8 +52,3 @@ find . -type f -exec sed -i 's/go-microservice/your-project-name/g' {} +
 
 ### Donate
 - **Bitcoin** [(QR)](https://raw.githubusercontent.com/javiorfo/img/master/crypto/bitcoin.png)  `1GqdJ63RDPE4eJKujHi166FAyigvHu5R7v`
-
-## TODO
-- Swagger
-- go-micro-lib
-- mongo

@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// Auditable creates data fields for recording auditory
 type Auditable struct {
 	CreatedBy      string     `json:"-"`
 	LastModifiedBy *string    `json:"-"`

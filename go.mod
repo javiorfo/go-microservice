@@ -9,6 +9,7 @@ require (
 	github.com/gofiber/swagger v1.1.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/stretchr/testify v1.9.0
+	github.com/swaggo/swag v1.16.3
 	github.com/testcontainers/testcontainers-go v0.32.0
 	go.opentelemetry.io/otel v1.28.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.28.0
@@ -87,7 +88,6 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/swaggo/swag v1.16.3 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

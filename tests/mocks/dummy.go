@@ -46,7 +46,7 @@ func (m *MockDummyRepository) FindById(id uint) (*model.Dummy, error) {
 }
 
 func (m *MockDummyRepository) FindAll(page pagination.Page) ([]model.Dummy, error) {
-    args := m.Called(page)
+	args := m.Called(page)
 	if dummies, ok := args.Get(0).([]model.Dummy); ok {
 		return dummies, args.Error(1)
 	}
