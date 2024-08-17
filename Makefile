@@ -67,7 +67,7 @@ run:
 .PHONY: swagger
 swagger:
 	@echo "Creating swagger api..."
-	@swag init
+	@swag init --parseDependency
 	@swag fmt
 	@go run docs/cmd/replace.go
 	@echo "Done!"
@@ -91,6 +91,7 @@ help:
 	@echo "  make docker   - Create Docker image"
 	@echo "  make help     - Show this help message"
 	@echo "  make info     - Print Info"
+	@echo "  make install  - Install libraries"
 	@echo "  make migrate  - Migrate database schema"
 	@echo "  make run      - Run the application"
 	@echo "  make swagger  - Create swagger api"
