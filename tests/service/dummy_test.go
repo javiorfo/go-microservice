@@ -6,7 +6,7 @@ import (
 
 	"github.com/javiorfo/go-microservice/domain/model"
 	"github.com/javiorfo/go-microservice/domain/service"
-	"github.com/javiorfo/go-microservice/internal/pagination"
+	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice/tests/mocks"
 	"github.com/stretchr/testify/assert"
 )

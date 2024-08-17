@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/javiorfo/go-microservice/domain/model"
-	"github.com/javiorfo/go-microservice/internal/pagination"
+	"github.com/javiorfo/go-microservice-lib/pagination"
 	"gorm.io/gorm"
 )
 

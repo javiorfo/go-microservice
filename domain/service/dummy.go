@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/javiorfo/go-microservice/domain/model"
 	"github.com/javiorfo/go-microservice/domain/repository"
-	"github.com/javiorfo/go-microservice/internal/pagination"
+	"github.com/javiorfo/go-microservice-lib/pagination"
 )
 
 type DummyService interface {

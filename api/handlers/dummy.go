@@ -10,11 +10,11 @@ import (
 	"github.com/javiorfo/go-microservice/api/request"
 	"github.com/javiorfo/go-microservice/domain/model"
 	"github.com/javiorfo/go-microservice/domain/service"
-	"github.com/javiorfo/go-microservice/internal/auditory"
-	"github.com/javiorfo/go-microservice/internal/pagination"
-	"github.com/javiorfo/go-microservice/internal/response"
-	"github.com/javiorfo/go-microservice/internal/response/codes"
-	"github.com/javiorfo/go-microservice/internal/tracing"
+	"github.com/javiorfo/go-microservice-lib/auditory"
+	"github.com/javiorfo/go-microservice-lib/pagination"
+	"github.com/javiorfo/go-microservice-lib/response"
+	"github.com/javiorfo/go-microservice-lib/response/codes"
+	"github.com/javiorfo/go-microservice-lib/tracing"
 )
 
 // @Summary		Find a dummy by ID

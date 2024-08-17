@@ -1,6 +1,6 @@
 package model
 
-import "github.com/javiorfo/go-microservice/internal/auditory"
+import "github.com/javiorfo/go-microservice-lib/auditory"
 
 // Dummy represents a dada structure
 type Dummy struct {

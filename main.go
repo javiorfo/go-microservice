@@ -16,7 +16,7 @@ import (
 	"github.com/javiorfo/go-microservice/config"
 	_ "github.com/javiorfo/go-microservice/docs"
 	"github.com/javiorfo/go-microservice/internal/injection"
-	"github.com/javiorfo/go-microservice/internal/tracing"
+	"github.com/javiorfo/go-microservice-lib/tracing"
 )
 
 // @contact.name						API Support
@@ -87,15 +87,17 @@ func main() {
 	injection.Inject(api)
 
 	// Swagger
-	app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.New(swagger.Config{
-		DeepLinking:  false,
-		DocExpansion: "none",
-		OAuth: &swagger.OAuthConfig{
-			Realm:        config.KeycloakConfig.Realm,
-			ClientId:     config.KeycloakConfig.ClientID,
-			ClientSecret: config.KeycloakConfig.ClientSecret,
-		},
-	}))
+	if config.SwaggerEnabled == "true" {
+		app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.New(swagger.Config{
+			DeepLinking:  false,
+			DocExpansion: "none",
+			OAuth: &swagger.OAuthConfig{
+				Realm:        config.KeycloakConfig.Realm,
+				ClientId:     config.KeycloakConfig.ClientID,
+				ClientSecret: config.KeycloakConfig.ClientSecret,
+			},
+		}))
+	}
 
 	log.Infof("Context path: %s", config.AppContextPath)
 	log.Infof("Starting %s on port %s...", config.AppName, config.AppPort)

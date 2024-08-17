@@ -3,8 +3,8 @@ package config
 import (
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/javiorfo/go-microservice/internal/database"
-	"github.com/javiorfo/go-microservice/internal/env"
-	"github.com/javiorfo/go-microservice/internal/security"
+	"github.com/javiorfo/go-microservice-lib/env"
+	"github.com/javiorfo/go-microservice-lib/security"
 )
 
 // Keycloak configuration

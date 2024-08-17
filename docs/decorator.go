@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/javiorfo/go-microservice/config"
-	"github.com/javiorfo/go-microservice/internal/env"
+	"github.com/javiorfo/go-microservice-lib/env"
 	"github.com/swaggo/swag"
 )
 
