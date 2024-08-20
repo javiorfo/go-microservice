@@ -24,6 +24,11 @@ const docTemplate = `{
     "paths": {
         "/dummy": {
             "get": {
+                "security": [
+                    {
+                        "OAuth2Password": []
+                    }
+                ],
                 "description": "Get a list of dummies with pagination",
                 "consumes": [
                     "application/json"
@@ -83,6 +88,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "OAuth2Password": []
+                    }
+                ],
                 "description": "Create a new dummy item with the provided information",
                 "consumes": [
                     "application/json"
@@ -129,6 +139,11 @@ const docTemplate = `{
         },
         "/dummy/{id}": {
             "get": {
+                "security": [
+                    {
+                        "OAuth2Password": []
+                    }
+                ],
                 "description": "Get dummy details by ID",
                 "consumes": [
                     "application/json"

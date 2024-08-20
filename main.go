@@ -90,7 +90,7 @@ func main() {
 	if config.SwaggerEnabled == "true" {
 		app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.New(swagger.Config{
 			DeepLinking:  false,
-			DocExpansion: "none",
+			DocExpansion: "list",
 			OAuth: &swagger.OAuthConfig{
 				Realm:        config.KeycloakConfig.Realm,
 				ClientId:     config.KeycloakConfig.ClientID,

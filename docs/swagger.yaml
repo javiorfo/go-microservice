@@ -90,6 +90,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/response.restResponseError'
+      security:
+      - OAuth2Password: []
       summary: List all dummies
       tags:
       - dummy
@@ -119,6 +121,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/response.restResponseError'
+      security:
+      - OAuth2Password: []
       summary: Create a new dummy item
       tags:
       - dummy
@@ -148,6 +152,8 @@ paths:
           description: Internal Error
           schema:
             $ref: '#/definitions/response.restResponseError'
+      security:
+      - OAuth2Password: []
       summary: Find a dummy by ID
       tags:
       - dummy
