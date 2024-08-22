@@ -40,7 +40,7 @@ Golang, Docker, Make, [Swag tool](https://github.com/swaggo/swag)
 
 ## Usage
 - Executing `make help` all the available commands will be listed. 
-- Also the standard Go commands could be used, like `go run cmd/main.go`
+- Also the standard Go commands could be used, like `go run main.go`
 - To use this archetype with a different name, execute this command to replace the names:
 ```bash
 find . -type f -exec sed -i 's/go-microservice/your-project-name/g' {} +
