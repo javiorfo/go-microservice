@@ -11,7 +11,7 @@ const keycloakRoles = "CLIENT_ADMIN"
 const root = "/dummy"
 
 func Dummy(app fiber.Router, sec security.Securizer, service service.DummyService) {
-	app.Get(root+"/:id", sec.SecureWithRoles(keycloakRoles), handlers.GetDummyById(service))
-	app.Get(root, sec.SecureWithRoles(keycloakRoles), handlers.GetDummies(service))
-	app.Post(root, sec.SecureWithRoles(keycloakRoles), handlers.CreateDummy(service))
+	app.Get(root+"/:id", sec.Secure(keycloakRoles), handlers.GetDummyById(service))
+	app.Get(root, sec.Secure(keycloakRoles), handlers.GetDummies(service))
+	app.Post(root, sec.Secure(keycloakRoles), handlers.CreateDummy(service))
 }

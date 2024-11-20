@@ -18,6 +18,6 @@ const keycloakLocal = "http://localhost:8081"
 func (i *SwaggerInfoWrapper) ReadDoc() string {
 	i.BasePath = config.AppContextPath
 	i.Title = config.AppName
-	i.SwaggerTemplate = strings.Replace(docTemplate, keycloakEnvVar, env.GetEnvOrDefault(keycloakEnvVar, keycloakLocal), 1)
+	i.SwaggerTemplate = strings.Replace(docTemplate, keycloakEnvVar, env.GetEnvOr(keycloakEnvVar, keycloakLocal), 1)
 	return i.Spec.ReadDoc()
 }

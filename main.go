@@ -87,7 +87,7 @@ func main() {
 	injection.Inject(api)
 
 	// Swagger
-	if config.SwaggerEnabled == "true" {
+	if config.SwaggerEnabled {
 		app.Get(fmt.Sprintf("%s/swagger/*", config.AppContextPath), swagger.New(swagger.Config{
 			DeepLinking:  false,
 			DocExpansion: "list",

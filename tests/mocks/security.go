@@ -10,7 +10,7 @@ type MockSecurizer struct {
 	mock.Mock
 }
 
-func (m *MockSecurizer) SecureWithRoles(roles ...string) fiber.Handler {
+func (m *MockSecurizer) Secure(roles ...string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.Next()
 	}
