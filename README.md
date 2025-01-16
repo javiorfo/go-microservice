@@ -21,6 +21,7 @@ Golang, Docker, Make, [Swag tool](https://github.com/swaggo/swag)
     - Tracing: Opentelemetry
     - Test: Testcontainers
     - OpenAPI: Fiber Swagger
+    - Environment: Godot
 - Keycloak as Auth Server
 - Distributed tracing
     - OpenTelemetry, Micrometer and Jaeger

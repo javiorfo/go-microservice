@@ -7,6 +7,9 @@ import (
 	"github.com/javiorfo/go-microservice-lib/security"
 )
 
+// IMPORTANT
+// If .env exists it uses the environment variables, otherwise the fallback
+
 // Keycloak configuration
 var KeycloakConfig = security.KeycloakConfig{
 	Keycloak:     gocloak.NewClient(env.GetEnvOr("KEYCLOAK_HOST", "http://localhost:8081")),

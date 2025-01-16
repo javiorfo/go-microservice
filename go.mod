@@ -7,7 +7,7 @@ require (
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/swagger v1.1.0
-	github.com/javiorfo/go-microservice-lib v0.0.0-20241126152022-378d2f451a68
+	github.com/javiorfo/go-microservice-lib v0.0.0-20241130172626-ab2758eb81a9
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.16.3
 	github.com/testcontainers/testcontainers-go v0.32.0
