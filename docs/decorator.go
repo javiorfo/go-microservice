@@ -3,8 +3,8 @@ package docs
 import (
 	"strings"
 
-	"github.com/javiorfo/go-microservice/config"
 	"github.com/javiorfo/go-microservice-lib/env"
+	"github.com/javiorfo/go-microservice/config"
 	"github.com/swaggo/swag"
 )
 

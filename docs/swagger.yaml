@@ -157,6 +157,31 @@ paths:
       summary: Find a dummy by ID
       tags:
       - dummy
+  /dummy/external/api:
+    get:
+      consumes:
+      - application/json
+      description: Call external API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Dummy'
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/response.restResponseError'
+        "404":
+          description: Internal Error
+          schema:
+            $ref: '#/definitions/response.restResponseError'
+      security:
+      - OAuth2Password: []
+      summary: Call external API
+      tags:
+      - dummy
 securityDefinitions:
   OAuth2Password:
     flow: password

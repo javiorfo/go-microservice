@@ -1,26 +1,30 @@
 package dummy_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
+	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice/domain/model"
 	"github.com/javiorfo/go-microservice/domain/service"
-	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice/tests/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestFindById(t *testing.T) {
 	mockRepo := new(mocks.MockDummyRepository)
-	dummyService := service.NewDummyService(mockRepo)
+	mockClient := new(mocks.MockClient)
+	mockAsync := new(mocks.MockAsync)
+	dummyService := service.NewDummyService(mockRepo, mockClient, mockAsync)
 
 	id := uint(1)
 	expectedDummy := &model.Dummy{ID: id}
 
-	mockRepo.On("FindById", id).Return(expectedDummy, nil)
+	ctx := context.Background()
+	mockRepo.On("FindById", ctx, id).Return(expectedDummy, nil)
 
-	result, err := dummyService.FindById(id)
+	result, err := dummyService.FindById(ctx, id)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedDummy, result)
@@ -29,13 +33,16 @@ func TestFindById(t *testing.T) {
 
 func TestFindByIdNotFound(t *testing.T) {
 	mockRepo := new(mocks.MockDummyRepository)
-	dummyService := service.NewDummyService(mockRepo)
+	mockClient := new(mocks.MockClient)
+	mockAsync := new(mocks.MockAsync)
+	dummyService := service.NewDummyService(mockRepo, mockClient, mockAsync)
 
 	id := uint(1)
 
-	mockRepo.On("FindById", id).Return(nil, errors.New("not found"))
+	ctx := context.Background()
+	mockRepo.On("FindById", ctx, id).Return(nil, errors.New("not found"))
 
-	result, err := dummyService.FindById(id)
+	result, err := dummyService.FindById(ctx, id)
 
 	assert.Error(t, err)
 	assert.Nil(t, result)
@@ -44,7 +51,9 @@ func TestFindByIdNotFound(t *testing.T) {
 
 func TestFindAll(t *testing.T) {
 	mockRepo := new(mocks.MockDummyRepository)
-	dummyService := service.NewDummyService(mockRepo)
+	mockClient := new(mocks.MockClient)
+	mockAsync := new(mocks.MockAsync)
+	dummyService := service.NewDummyService(mockRepo, mockClient, mockAsync)
 
 	page := pagination.Page{Page: 1, Size: 10, SortBy: "id", SortOrder: "asc"}
 	expectedDummies := []model.Dummy{
@@ -52,9 +61,10 @@ func TestFindAll(t *testing.T) {
 		{ID: 2},
 	}
 
-	mockRepo.On("FindAll", page).Return(expectedDummies, nil)
+	ctx := context.Background()
+	mockRepo.On("FindAll", ctx, page).Return(expectedDummies, nil)
 
-	result, err := dummyService.FindAll(page)
+	result, err := dummyService.FindAll(ctx, page)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedDummies, result)
@@ -63,13 +73,16 @@ func TestFindAll(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	mockRepo := new(mocks.MockDummyRepository)
-	dummyService := service.NewDummyService(mockRepo)
+	mockClient := new(mocks.MockClient)
+	mockAsync := new(mocks.MockAsync)
+	dummyService := service.NewDummyService(mockRepo, mockClient, mockAsync)
 
 	newDummy := &model.Dummy{ID: 1}
 
-	mockRepo.On("Create", newDummy).Return(nil)
+	ctx := context.Background()
+	mockRepo.On("Create", ctx, newDummy).Return(nil)
 
-	err := dummyService.Create(newDummy)
+	err := dummyService.Create(ctx, newDummy)
 
 	assert.NoError(t, err)
 	mockRepo.AssertExpectations(t)

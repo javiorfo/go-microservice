@@ -2,9 +2,10 @@ package config
 
 import (
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/javiorfo/go-microservice/internal/database"
 	"github.com/javiorfo/go-microservice-lib/env"
+	"github.com/javiorfo/go-microservice-lib/integration"
 	"github.com/javiorfo/go-microservice-lib/security"
+	"github.com/javiorfo/go-microservice/internal/database"
 )
 
 // IMPORTANT
@@ -26,6 +27,14 @@ var DBDataConnection = database.DBDataConnection{
 	User:        env.GetEnvOr("DB_USER", "admin"),
 	Password:    env.GetEnvOr("DB_PASSWORD", "admin"),
 	ShowSQLInfo: true,
+}
+
+var DBAsyncDataConnection = integration.DBDataConnection{
+	Host:     env.GetEnvOr("DB_HOST", "localhost"),
+	Port:     env.GetEnvOr("DB_PORT", "27017"),
+	DBName:   env.GetEnvOr("DB_NAME", "db_dummy"),
+	User:     env.GetEnvOr("DB_USER", "admin"),
+	Password: env.GetEnvOr("DB_PASSWORD", "admin"),
 }
 
 // App configuration

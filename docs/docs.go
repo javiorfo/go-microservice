@@ -137,6 +137,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/dummy/external/api": {
+            "get": {
+                "security": [
+                    {
+                        "OAuth2Password": []
+                    }
+                ],
+                "description": "Call external API",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "dummy"
+                ],
+                "summary": "Call external API",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Dummy"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID",
+                        "schema": {
+                            "$ref": "#/definitions/response.restResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Internal Error",
+                        "schema": {
+                            "$ref": "#/definitions/response.restResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/dummy/{id}": {
             "get": {
                 "security": [

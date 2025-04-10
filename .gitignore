@@ -15,7 +15,7 @@
 *.out
 
 # Log file
-*.log
+var
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -26,6 +26,7 @@ go.work.sum
 
 # Makefile
 /bin/
+main
 
 # env
 .env

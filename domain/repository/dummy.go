@@ -1,32 +1,39 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
-	"github.com/javiorfo/go-microservice/domain/model"
 	"github.com/javiorfo/go-microservice-lib/pagination"
+	"github.com/javiorfo/go-microservice-lib/tracing"
+	"github.com/javiorfo/go-microservice/domain/model"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/gorm"
 )
 
 type DummyRepository interface {
-	FindById(id uint) (*model.Dummy, error)
-	FindAll(pagination.Page) ([]model.Dummy, error)
-	Create(*model.Dummy) error
+	FindById(context.Context, uint) (*model.Dummy, error)
+	FindAll(context.Context, pagination.Page) ([]model.Dummy, error)
+	Create(context.Context, *model.Dummy) error
 }
 
 type dummyRepository struct {
 	*gorm.DB
+	tracer trace.Tracer
 }
 
 func NewDummyRepository(db *gorm.DB) DummyRepository {
-	return &dummyRepository{db}
+	return &dummyRepository{DB: db, tracer: otel.Tracer(tracing.Name())}
 }
 
-func (repository *dummyRepository) FindById(id uint) (*model.Dummy, error) {
-	var dummy model.Dummy
+func (repository *dummyRepository) FindById(ctx context.Context, id uint) (*model.Dummy, error) {
+	ctx, span := repository.tracer.Start(ctx, tracing.Name())
+	defer span.End()
 
-	result := repository.Find(&dummy, "id = ?", id)
+	var dummy model.Dummy
+	result := repository.WithContext(ctx).Find(&dummy, "id = ?", id)
 
 	if err := result.Error; err != nil {
 		return nil, err
@@ -39,10 +46,12 @@ func (repository *dummyRepository) FindById(id uint) (*model.Dummy, error) {
 	return &dummy, nil
 }
 
-func (repository *dummyRepository) FindAll(page pagination.Page) ([]model.Dummy, error) {
-	var dummies []model.Dummy
+func (repository *dummyRepository) FindAll(ctx context.Context, page pagination.Page) ([]model.Dummy, error) {
+	ctx, span := repository.tracer.Start(ctx, tracing.Name())
+	defer span.End()
 
-	results := repository.
+	var dummies []model.Dummy
+	results := repository.WithContext(ctx).
 		Offset(page.Page - 1).
 		Limit(page.Size).
 		Order(fmt.Sprintf("%s %s", page.SortBy, page.SortOrder)).
@@ -55,9 +64,11 @@ func (repository *dummyRepository) FindAll(page pagination.Page) ([]model.Dummy,
 	return dummies, nil
 }
 
-func (repository *dummyRepository) Create(d *model.Dummy) error {
-	result := repository.DB.Create(d)
+func (repository *dummyRepository) Create(ctx context.Context, d *model.Dummy) error {
+	ctx, span := repository.tracer.Start(ctx, tracing.Name())
+	defer span.End()
 
+	result := repository.DB.WithContext(ctx).Create(d)
 	if err := result.Error; err != nil {
 		return fmt.Errorf("Error creating dummy %v", err)
 	}

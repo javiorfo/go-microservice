@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -29,7 +30,7 @@ func (db DBDataConnection) Connect() error {
 		db.Password)
 
 	loggerSQL := logger.Default.LogMode(logger.Info)
-	if db.ShowSQLInfo {
+	if !db.ShowSQLInfo {
 		loggerSQL = logger.Discard
 	}
 
@@ -38,6 +39,11 @@ func (db DBDataConnection) Connect() error {
 	})
 	if err != nil {
 		return err
+	}
+
+	err = database.Use(otelgorm.NewPlugin())
+	if err != nil {
+		return fmt.Errorf("Could not set otelgorm %v", err)
 	}
 
 	log.Info("Connected to DB!")

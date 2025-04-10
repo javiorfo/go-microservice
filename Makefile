@@ -33,8 +33,9 @@ clean:
 .PHONY: docker
 docker: test build
 	@echo "Building Docker image..."
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main main.go
 	@docker build -t $(APP_NAME):$(VERSION) .
-	@make clean
+	@$(RM) main
 	@echo "$(APP_NAME):$(VERSION) image created!"
 
 .PHONY: info

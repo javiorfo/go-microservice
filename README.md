@@ -10,7 +10,7 @@ Golang, Docker, Make, [Swag tool](https://github.com/swaggo/swag)
     - Custom Messages and Errors
     - Pagination and Ordering
     - DB Migrator
-- Go 1.23 (at the moment)
+- Go 1.24 (at the moment)
 - Libraries
     - Web: Fiber
     - ORM: Gorm
