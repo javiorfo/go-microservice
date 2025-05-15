@@ -15,7 +15,7 @@ import (
 
 type DummyRepository interface {
 	FindById(context.Context, uint) (*model.Dummy, error)
-	FindAll(context.Context, pagination.Page) ([]model.Dummy, error)
+	FindAll(context.Context, pagination.Page, string) ([]model.Dummy, error)
 	Create(context.Context, *model.Dummy) error
 }
 
@@ -46,16 +46,21 @@ func (repository *dummyRepository) FindById(ctx context.Context, id uint) (*mode
 	return &dummy, nil
 }
 
-func (repository *dummyRepository) FindAll(ctx context.Context, page pagination.Page) ([]model.Dummy, error) {
+func (repository *dummyRepository) FindAll(ctx context.Context, page pagination.Page, info string) ([]model.Dummy, error) {
 	ctx, span := repository.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
 	var dummies []model.Dummy
-	results := repository.WithContext(ctx).
+	filter := repository.WithContext(ctx).
 		Offset(page.Page - 1).
 		Limit(page.Size).
-		Order(fmt.Sprintf("%s %s", page.SortBy, page.SortOrder)).
-		Find(&dummies)
+		Order(fmt.Sprintf("%s %s", page.SortBy, page.SortOrder))
+
+	if info != "" {
+		filter = filter.Where("info = ?", info)
+	}
+	
+	results := filter.Find(&dummies)
 
 	if err := results.Error; err != nil {
 		return nil, err

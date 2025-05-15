@@ -62,9 +62,9 @@ func TestFindAll(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	mockRepo.On("FindAll", ctx, page).Return(expectedDummies, nil)
+	mockRepo.On("FindAll", ctx, page, "").Return(expectedDummies, nil)
 
-	result, err := dummyService.FindAll(ctx, page)
+	result, err := dummyService.FindAll(ctx, page, "")
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedDummies, result)

@@ -83,7 +83,7 @@ func TestFindAll(t *testing.T) {
 	t.Run("Successful", func(t *testing.T) {
 		app, mockService := setupTest()
 		page := pagination.Page{Page: 1, Size: 10, SortBy: "info", SortOrder: "asc"}
-		mockService.On("FindAll", ctx, page).Return([]model.Dummy{{ID: 1, Info: "info"}}, nil)
+		mockService.On("FindAll", ctx, page, "").Return([]model.Dummy{{ID: 1, Info: "info"}}, nil)
 
 		req := httptest.NewRequest("GET", "/dummy?page=1&size=10&sortBy=info&sortOrder=asc", nil)
 		resp, err := app.Test(req)
@@ -101,7 +101,7 @@ func TestFindAll(t *testing.T) {
 
 	t.Run("DB Error", func(t *testing.T) {
 		app, mockService := setupTest()
-		mockService.On("FindAll", ctx, mock.Anything).Return(nil, errors.New("data source error"))
+		mockService.On("FindAll", ctx, mock.Anything, "").Return(nil, errors.New("data source error"))
 
 		req := httptest.NewRequest("GET", "/dummy?page=1&size=10&sortBy=id&sortOrder=asc", nil)
 		resp, err := app.Test(req)

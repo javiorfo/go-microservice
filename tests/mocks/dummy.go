@@ -21,8 +21,8 @@ func (m *MockDummyService) FindById(ctx context.Context, id uint) (*model.Dummy,
 	return nil, args.Error(1)
 }
 
-func (m *MockDummyService) FindAll(ctx context.Context, page pagination.Page) ([]model.Dummy, error) {
-	args := m.Called(ctx, page)
+func (m *MockDummyService) FindAll(ctx context.Context, page pagination.Page, info string) ([]model.Dummy, error) {
+	args := m.Called(ctx, page, info)
 	if dummies, ok := args.Get(0).([]model.Dummy); ok {
 		return dummies, args.Error(1)
 	}
@@ -55,8 +55,8 @@ func (m *MockDummyRepository) FindById(ctx context.Context, id uint) (*model.Dum
 	return nil, args.Error(1)
 }
 
-func (m *MockDummyRepository) FindAll(ctx context.Context, page pagination.Page) ([]model.Dummy, error) {
-	args := m.Called(ctx, page)
+func (m *MockDummyRepository) FindAll(ctx context.Context, page pagination.Page, info string) ([]model.Dummy, error) {
+	args := m.Called(ctx, page, info)
 	if dummies, ok := args.Get(0).([]model.Dummy); ok {
 		return dummies, args.Error(1)
 	}

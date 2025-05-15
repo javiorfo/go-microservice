@@ -36,7 +36,7 @@ Golang, Docker, Make, [Swag tool](https://github.com/swaggo/swag)
 
 ## Files
 - [Dockerfile](https://github.com/javiorfo/go-microservice/tree/master/Dockerfile)
-- [Ship files](https://github.com/javiorfo/java-spring3-microservice/tree/master/ships)
+- [Ship files](https://github.com/javiorfo/go-microservice/tree/master/ships)
     - For those using Neovim and [this plugin](https://github.com/javiorfo/nvim-ship)
 
 ## Usage

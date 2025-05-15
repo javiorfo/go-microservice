@@ -106,6 +106,8 @@ func GetDummies(ds service.DummyService) fiber.Handler {
 		sb := c.Query("sortBy", "id")
 		so := c.Query("sortOrder", "asc")
 
+		info := c.Get("info")
+
 		log.Infof("%s Listing dummies...", tracing.LogTraceAndSpan(span))
 		log.Infof("%s page %s, size %s, sortBy %s, sortOrder %s ", tracing.LogTraceAndSpan(span), p, s, sb, so)
 
@@ -115,7 +117,7 @@ func GetDummies(ds service.DummyService) fiber.Handler {
 				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, codes.DUMMY_FIND_ERROR, err.Error()))
 		}
 
-		dummies, err := ds.FindAll(ctx, *page)
+		dummies, err := ds.FindAll(ctx, *page, info)
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).
 				JSON(response.InternalServerError(span, err.Error()))

@@ -15,7 +15,7 @@ import (
 
 type DummyService interface {
 	FindById(context.Context, uint) (*model.Dummy, error)
-	FindAll(context.Context, pagination.Page) ([]model.Dummy, error)
+	FindAll(context.Context, pagination.Page, string) ([]model.Dummy, error)
 	Create(context.Context, *model.Dummy) error
 	External(context.Context) (string, error)
 }
@@ -43,11 +43,11 @@ func (service *dummyService) FindById(ctx context.Context, id uint) (*model.Dumm
 	return service.repository.FindById(ctx, id)
 }
 
-func (service *dummyService) FindAll(ctx context.Context, page pagination.Page) ([]model.Dummy, error) {
+func (service *dummyService) FindAll(ctx context.Context, page pagination.Page, info string) ([]model.Dummy, error) {
 	_, span := service.tracer.Start(ctx, tracing.Name())
 	defer span.End()
 
-	return service.repository.FindAll(ctx, page)
+	return service.repository.FindAll(ctx, page, info)
 }
 
 func (service *dummyService) Create(ctx context.Context, d *model.Dummy) error {
