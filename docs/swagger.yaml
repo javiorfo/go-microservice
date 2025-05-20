@@ -29,6 +29,13 @@ definitions:
       message:
         type: string
     type: object
+  response.RestResponseError:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/response.ResponseError'
+        type: array
+    type: object
   response.RestResponsePagination-model_Dummy:
     properties:
       elements:
@@ -37,13 +44,6 @@ definitions:
         type: array
       pagination:
         $ref: '#/definitions/response.PaginationResponse'
-    type: object
-  response.restResponseError:
-    properties:
-      errors:
-        items:
-          $ref: '#/definitions/response.ResponseError'
-        type: array
     type: object
 info:
   contact:
@@ -85,11 +85,11 @@ paths:
         "400":
           description: Invalid query parameters
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
       security:
       - OAuth2Password: []
       summary: List all dummies
@@ -116,11 +116,11 @@ paths:
         "400":
           description: Invalid request body or validation errors
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
       security:
       - OAuth2Password: []
       summary: Create a new dummy item
@@ -147,11 +147,11 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
         "404":
           description: Internal Error
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
       security:
       - OAuth2Password: []
       summary: Find a dummy by ID
@@ -172,11 +172,11 @@ paths:
         "400":
           description: Invalid ID
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
         "404":
           description: Internal Error
           schema:
-            $ref: '#/definitions/response.restResponseError'
+            $ref: '#/definitions/response.RestResponseError'
       security:
       - OAuth2Password: []
       summary: Call external API

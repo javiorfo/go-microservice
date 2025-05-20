@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"go.opentelemetry.io/otel"
@@ -15,6 +14,7 @@ import (
 	"github.com/javiorfo/go-microservice-lib/response/codes"
 	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/tracing"
+	"github.com/javiorfo/go-microservice-lib/validation"
 	"github.com/javiorfo/go-microservice/api/request"
 	"github.com/javiorfo/go-microservice/domain/model"
 	"github.com/javiorfo/go-microservice/domain/service"
@@ -27,8 +27,8 @@ import (
 // @Produce		json
 // @Param			id	path		int	true	"Dummy ID"
 // @Success		200	{object}	model.Dummy
-// @Failure		400	{object}	response.restResponseError	"Invalid ID"
-// @Failure		404	{object}	response.restResponseError	"Internal Error"
+// @Failure		400	{object}	response.RestResponseError	"Invalid ID"
+// @Failure		404	{object}	response.RestResponseError	"Internal Error"
 // @Router			/dummy/{id} [get]
 // @Security		OAuth2Password
 func GetDummyById(ds service.DummyService) fiber.Handler {
@@ -62,8 +62,8 @@ func GetDummyById(ds service.DummyService) fiber.Handler {
 // @Accept			json
 // @Produce		json
 // @Success		200	{object}	model.Dummy
-// @Failure		400	{object}	response.restResponseError	"Invalid ID"
-// @Failure		404	{object}	response.restResponseError	"Internal Error"
+// @Failure		400	{object}	response.RestResponseError	"Invalid ID"
+// @Failure		404	{object}	response.RestResponseError	"Internal Error"
 // @Router			/dummy/external/api [get]
 // @Security		OAuth2Password
 func CallExternalApi(ds service.DummyService) fiber.Handler {
@@ -91,8 +91,8 @@ func CallExternalApi(ds service.DummyService) fiber.Handler {
 // @Param			sortBy		query		string											false	"Sort by field"
 // @Param			sortOrder	query		string											false	"Sort order (asc or desc)"
 // @Success		200			{object}	response.RestResponsePagination[model.Dummy]	"Paginated list of dummies"
-// @Failure		400			{object}	response.restResponseError						"Invalid query parameters"
-// @Failure		500			{object}	response.restResponseError						"Internal server error"
+// @Failure		400			{object}	response.RestResponseError						"Invalid query parameters"
+// @Failure		500			{object}	response.RestResponseError						"Internal server error"
 // @Router			/dummy [get]
 // @Security		OAuth2Password
 func GetDummies(ds service.DummyService) fiber.Handler {
@@ -137,8 +137,8 @@ func GetDummies(ds service.DummyService) fiber.Handler {
 // @Produce		json
 // @Param			dummy	body		request.Dummy	true	"Dummy information"
 // @Success		201		{object}	model.Dummy
-// @Failure		400		{object}	response.restResponseError	"Invalid request body or validation errors"
-// @Failure		500		{object}	response.restResponseError	"Internal server error"
+// @Failure		400		{object}	response.RestResponseError	"Invalid request body or validation errors"
+// @Failure		500		{object}	response.RestResponseError	"Internal server error"
 // @Router			/dummy [post]
 // @Security		OAuth2Password
 func CreateDummy(ds service.DummyService) fiber.Handler {
@@ -149,15 +149,9 @@ func CreateDummy(ds service.DummyService) fiber.Handler {
 
 		dummyRequest := new(request.Dummy)
 
-		if err := c.BodyParser(dummyRequest); err != nil {
-			return c.Status(http.StatusBadRequest).
-				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, codes.DUMMY_CREATE_ERROR, "Invalid request body"))
-		}
-		validate := validator.New()
-		if err := validate.Struct(dummyRequest); err != nil {
-			validationErrors := err.(validator.ValidationErrors)
-			return c.Status(fiber.StatusBadRequest).
-				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, codes.DUMMY_CREATE_ERROR, validationErrors.Error()))
+		dummyRequest, errResp := validation.ValidateRequest[request.Dummy](c, span, codes.DUMMY_CREATE_ERROR)
+		if errResp != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(errResp)
 		}
 
 		log.Infof("%s Received dummy: %+v", tracing.LogTraceAndSpan(span), dummyRequest)

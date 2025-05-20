@@ -76,13 +76,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid query parameters",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     }
                 }
@@ -125,13 +125,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid request body or validation errors",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     }
                 }
@@ -165,13 +165,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     },
                     "404": {
                         "description": "Internal Error",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     }
                 }
@@ -214,13 +214,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Invalid ID",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     },
                     "404": {
                         "description": "Internal Error",
                         "schema": {
-                            "$ref": "#/definitions/response.restResponseError"
+                            "$ref": "#/definitions/response.RestResponseError"
                         }
                     }
                 }
@@ -275,6 +275,17 @@ const docTemplate = `{
                 }
             }
         },
+        "response.RestResponseError": {
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.ResponseError"
+                    }
+                }
+            }
+        },
         "response.RestResponsePagination-model_Dummy": {
             "type": "object",
             "properties": {
@@ -286,17 +297,6 @@ const docTemplate = `{
                 },
                 "pagination": {
                     "$ref": "#/definitions/response.PaginationResponse"
-                }
-            }
-        },
-        "response.restResponseError": {
-            "type": "object",
-            "properties": {
-                "errors": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/response.ResponseError"
-                    }
                 }
             }
         }
