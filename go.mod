@@ -7,7 +7,7 @@ require (
 	github.com/gofiber/contrib/otelfiber v1.0.10
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/swagger v1.1.0
-	github.com/javiorfo/go-microservice-lib v0.0.0-20250520200157-f27235352312
+	github.com/javiorfo/go-microservice-lib v0.0.0-20250523191906-eb8215b77548
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/swag v1.16.3
 	github.com/testcontainers/testcontainers-go v0.36.0

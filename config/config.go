@@ -17,7 +17,7 @@ var KeycloakConfig = security.KeycloakConfig{
 	Realm:        "javi",
 	ClientID:     "srv-client",
 	ClientSecret: env.GetEnvOr("KEYCLOAK_CLIENT_SECRET", "RqaTlO0d2OnBbeRuImNnbLWm5yZL66Mo"),
-	Enabled:      true,
+	Enabled:      false,
 }
 
 var DBDataConnection = database.DBDataConnection{

@@ -10,5 +10,6 @@ Authorization Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJJVktibk9
 
 ~[BODY]~
 {
-    "info": "golang"
+    "info": "golang",
+    "status": "ONa"
 }

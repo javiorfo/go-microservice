@@ -132,7 +132,7 @@ func TestCreate(t *testing.T) {
 	t.Run("Successful", func(t *testing.T) {
 		app, mockService := setupTest()
 
-		dummyRequest := request.Dummy{Info: "dummy info"}
+		dummyRequest := request.Dummy{Info: "dummy info", Status: "ON"}
 		mockService.On("Create", ctx, mock.Anything).Return(nil)
 
 		body, _ := json.Marshal(dummyRequest)
@@ -167,7 +167,7 @@ func TestCreate(t *testing.T) {
 	t.Run("Internal Server Error", func(t *testing.T) {
 		app, mockService := setupTest()
 
-		dummyRequest := request.Dummy{Info: "test info"}
+		dummyRequest := request.Dummy{Info: "test info", Status: "OFF"}
 		mockService.On("Create", ctx, mock.Anything).Return(errors.New("service error"))
 
 		body, _ := json.Marshal(dummyRequest)

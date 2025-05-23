@@ -11,7 +11,6 @@ import (
 	"github.com/javiorfo/go-microservice-lib/auditory"
 	"github.com/javiorfo/go-microservice-lib/pagination"
 	"github.com/javiorfo/go-microservice-lib/response"
-	"github.com/javiorfo/go-microservice-lib/response/codes"
 	"github.com/javiorfo/go-microservice-lib/security"
 	"github.com/javiorfo/go-microservice-lib/tracing"
 	"github.com/javiorfo/go-microservice-lib/validation"
@@ -44,12 +43,12 @@ func GetDummyById(ds service.DummyService) fiber.Handler {
 		if err != nil {
 			log.Error("Invalid ID")
 			return c.Status(fiber.StatusBadRequest).
-				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, codes.DUMMY_FIND_ERROR, "Invalid ID"))
+				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, "DUMMY_FIND_ERROR", "Invalid ID"))
 		}
 
 		if dummy, err := ds.FindById(ctx, uint(id)); err != nil {
 			return c.Status(http.StatusNotFound).
-				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, codes.DUMMY_FIND_ERROR, err.Error()))
+				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, "DUMMY_FIND_ERROR", err.Error()))
 		} else {
 			return c.JSON(dummy)
 		}
@@ -114,7 +113,7 @@ func GetDummies(ds service.DummyService) fiber.Handler {
 		page, err := pagination.ValidateAndGetPage(p, s, sb, so)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).
-				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, codes.DUMMY_FIND_ERROR, err.Error()))
+				JSON(response.NewRestResponseErrorWithCodeAndMsg(span, "DUMMY_FIND_ERROR", err.Error()))
 		}
 
 		dummies, err := ds.FindAll(ctx, *page, info)
@@ -147,9 +146,7 @@ func CreateDummy(ds service.DummyService) fiber.Handler {
 		ctx, span := tracer.Start(c.UserContext(), c.Path())
 		defer span.End()
 
-		dummyRequest := new(request.Dummy)
-
-		dummyRequest, errResp := validation.ValidateRequest[request.Dummy](c, span, codes.DUMMY_CREATE_ERROR)
+		dummyRequest, errResp := validation.ValidateRequest[request.Dummy](c, span, "DUMMY_CREATE_ERROR", model.ValidateStatus("DUMMY_STATUS_ERROR"))
 		if errResp != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(errResp)
 		}
