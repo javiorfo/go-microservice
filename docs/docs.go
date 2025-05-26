@@ -236,16 +236,34 @@ const docTemplate = `{
                 },
                 "info": {
                     "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/model.Status"
                 }
             }
+        },
+        "model.Status": {
+            "type": "string",
+            "enum": [
+                "ON",
+                "OFF"
+            ],
+            "x-enum-varnames": [
+                "enable",
+                "disabled"
+            ]
         },
         "request.Dummy": {
             "type": "object",
             "required": [
-                "info"
+                "info",
+                "status"
             ],
             "properties": {
                 "info": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }

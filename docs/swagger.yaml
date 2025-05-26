@@ -5,13 +5,26 @@ definitions:
         type: integer
       info:
         type: string
+      status:
+        $ref: '#/definitions/model.Status'
     type: object
+  model.Status:
+    enum:
+    - "ON"
+    - "OFF"
+    type: string
+    x-enum-varnames:
+    - enable
+    - disabled
   request.Dummy:
     properties:
       info:
         type: string
+      status:
+        type: string
     required:
     - info
+    - status
     type: object
   response.PaginationResponse:
     properties:

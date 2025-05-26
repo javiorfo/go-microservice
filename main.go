@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/javiorfo/go-microservice-lib/tracing"
 	"github.com/javiorfo/go-microservice/config"
 	_ "github.com/javiorfo/go-microservice/docs"
@@ -58,6 +59,7 @@ func main() {
 	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
 	app.Use(cors.New())
+	app.Use(recover.New())
 
 	// Tracing in context
 	app.Use(otelfiber.Middleware())

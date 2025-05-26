@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
@@ -22,7 +23,7 @@ type DBDataConnection struct {
 var DBinstance *gorm.DB
 
 func (db DBDataConnection) Connect() error {
-	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable",
+	dsn := fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable TimeZone=America/Buenos_Aires",
 		db.Host,
 		db.Port,
 		db.DBName,
@@ -41,6 +42,19 @@ func (db DBDataConnection) Connect() error {
 		return err
 	}
 
+	sqlDB, err := database.DB()
+	if err != nil {
+		return fmt.Errorf("Could not get sql DB %v", err)
+	}
+
+	if err := sqlDB.Ping(); err != nil {
+		return fmt.Errorf("database ping failed: %w", err)
+	}
+
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(20 * time.Minute)
+
 	err = database.Use(otelgorm.NewPlugin())
 	if err != nil {
 		return fmt.Errorf("Could not set otelgorm %v", err)
@@ -49,5 +63,6 @@ func (db DBDataConnection) Connect() error {
 	log.Info("Connected to DB!")
 	database.Logger = loggerSQL
 	DBinstance = database
+
 	return nil
 }
